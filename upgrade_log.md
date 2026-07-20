@@ -106,3 +106,52 @@ files) — deviation from the plan's literal strip list, approved.
 **Next**: Phase 3 — migrate keepers into `$PROJECT` (harness/, queries/, db/,
 analysis/, manuscript/, results/) and the instant `mv` of `data/`, then repoint
 `run_biomni.py` paths.
+
+---
+
+## 2026-07-20 — Phase 3 DONE: keepers migrated into George
+
+Copied all keepers into `$PROJECT` and moved `data/`. Commit **`c41e411`**
+"Migrate keepers into George (Phase 3)".
+
+**Copied (originals left intact in `$OLD` archive)**
+- `run_biomni.py` → `harness/`; `512GB.sbatch`, `196GB.sbatch` → `harness/slurm/`.
+- `query_05_b.txt` → `queries/`; `query_01..05.txt` → `archive/queries/`.
+- `ms/5UTR_TNR_0605.pdf` → `manuscript/`; `AG_DB_DESIGN.md` → `db/`.
+- `pathogenic_repeat_analysis.ipynb`, `Candidate_Identification.ipynb`,
+  `Evaluate.ipynb`, `Verify.ipynb` → `analysis/`.
+- `Top_Candidate_Pathogenic_repeats.csv` → `results/`.
+- adapted `CLAUDE.md` (new layout, run-from-root, fork/gotchas) → `$PROJECT/`.
+- `upgrade.md`, `upgrade_log.md`, `.env` (gitignored) → `$PROJECT/`.
+
+**Moved (the one change to `$OLD`)**
+- `mv $OLD/Rpt_Ds/data $PROJECT/data` — instant rename (same `/blue/zhou` mount),
+  after asserting the target was absent. `$OLD/Rpt_Ds/data` no longer exists
+  (expected; reversible with the reverse `mv`; backups also exist).
+- Symlinked the 15G local data-lake cache: `$PROJECT/biomni_data_cache ->
+  $OLD/biomni_data_cache` (76 lake files). Reversible/free; NOT in the plan's
+  inventory but required by `run_biomni.py`. **George is otherwise self-contained
+  (its `data/` is a real dir); to fully detach later, `mv` the cache in.**
+
+**Harness path updates (`run_biomni.py`)**
+- Dropped `sys.path.append("./")` (biomni is the editable fork now).
+- `QUERY_FILE` → `queries/query_05_b.txt`; `DATA_FILES` → `data/5UTR/...`;
+  default `--output-dir` → `output`. Kept the corrected 5-entry `DATA_FILES`.
+- sbatch scripts: `python harness/run_biomni.py ...`, output under `output/`,
+  "submit from repo root" note added.
+
+**Checkpoint — ALL PASS** (run from `$PROJECT`):
+- `python harness/run_biomni.py --help` → exit 0 (no shadow error; loaded `.env`).
+- All 5 `DATA_FILES` resolve (three ~30 GB AG TSVs + catalog + pathogenic) and
+  `QUERY_FILE` resolves.
+- `import biomni` → `.../biomni-fork/biomni` (fork).
+- `./biomni_data_cache` resolves to 76 lake files via the symlink.
+
+**Gotcha hit & fixed**: git `.gitignore` doesn't support inline `# comments` —
+`biomni_data_cache  # …` briefly staged the symlink. Moved the comment to its own
+line; verified `git check-ignore` catches `biomni_data_cache`, `.env`, `data`,
+`output`.
+
+**Next**: Phase 4 — build the AG DuckDB/Parquet backend per `db/AG_DB_DESIGN.md`
+(prototype ETL on one file, then full 5'UTR ETL → `data/ag_db/`, then
+`db/query_ag.py`).
