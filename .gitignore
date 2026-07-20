@@ -1,0 +1,21 @@
+# Data & run outputs — never tracked (see upgrade.md constraints)
+data/
+output/
+db/ag_db/
+
+# Large / generated artifacts
+*.parquet
+*.tsv
+*.duckdb
+
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
