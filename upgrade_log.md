@@ -4,6 +4,32 @@ Running record of migration work executed against `upgrade.md`. Newest last.
 
 ---
 
+## ⏸️ CURRENT STATE — paused 2026-07-20 after Phase 3
+
+**Done: Phases 1, 2, 3.** **Next: Phase 4** (build AG DuckDB/Parquet backend).
+
+- **`biomni-fork`** (`/blue/zhou/leizhou/Agents/biomni-fork`): patched Biomni,
+  editable-installed into `biomni_e1`. `import biomni` resolves here. HEAD `3bcdf5f`.
+- **`George`** (`/blue/zhou/leizhou/Agents/George`): live project repo, 3 commits
+  (HEAD `2414b63`). Keepers migrated; harness repointed & runs (`--help` OK, all
+  `DATA_FILES` resolve). `data/` is a real dir (moved via `mv`); `biomni_data_cache`
+  is a symlink into `$OLD`.
+- **`Biomni_Rpts_Ds`** (`$OLD`): the archive. Only change so far = its
+  `Rpt_Ds/data/` was moved out (reversible). Not yet frozen (Phase 8). `upgrade.md`
+  still shows uncommitted.
+- **Nothing destructive done.** No TSVs deleted (Phase 7 is the only destructive
+  step, gated on Phase 6 parity). The 292 GB `$OLD/Rpt_Ds/output` untouched.
+
+**To resume**: `cd $PROJECT`, `conda activate biomni_e1`, then Phase 4 per
+`db/AG_DB_DESIGN.md` §5/§9 — prototype ETL on `data/5UTR/B_5UTR_all_GCN_2xAG.tsv`,
+then full 5'UTR ETL → `data/ag_db/`, then `db/query_ag.py`.
+
+**Open follow-ups (non-blocking)**: (1) `biomni-fork/README.md` is still the
+project readme, not Biomni's; (2) `biomni_data_cache` is a symlink — `mv` it into
+George to fully detach; (3) commit `$OLD/upgrade.md` if desired.
+
+---
+
 ## 2026-07-20 — Phase 2 DONE: scaffold `../George`
 
 Created the clean sibling project repo at
