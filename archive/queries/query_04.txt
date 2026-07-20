@@ -1,0 +1,101 @@
+TASK: Identify what distinguishes the repeat loci that cause diseases
+
+BACKGROUND: There are over 5,000 CCG repeats on the 5' UTRs (5UTR) of human genes. Of those, 7 are known to cause genetic disease due to their expansion.
+ 
+GOAL: Understand what the unique characteristics of pathogenic repeats are.
+
+
+DATA: 
+	(1) The B_5UTR_Pathogenic_CCG.txt file has the 7 pathogenic repeats, their unique id are in the "variant_id" column.
+
+	(2) A series of .tsv files output by AlphaGenome for the impact of repeat expansion.
+	The naming of these series files is as follows.
+	"_2xAG" - the consequence of 2 times expansion predicted by AlphaGenome (AG).
+	"_5xAG" - the consequence of 5 times expansion predicted by AlphaGenome (AG).
+	"_20xAG" - the consequence of 20 times expansion predicted by AlphaGenome (AG).
+
+	The AlphaGenome output files were too large, so they were divided into three files based on the "output_type".
+	"_exp" - contains prediction of the expansion effect on RNA_SEQ and CAGE.
+	"_splice" - contains output_type related with RNA splicing.
+	"_epi" - contains the rest of the output types, mostly have to do with TF binding and epigenetics.
+
+The following is a brief description of all columns in the AlphaGenome prediction columns:
+
+
+	original_variant_id – identifier for the over 5,000 5 UTR CCG-type repeats
+	scored_interval – Genomic window actually used for prediction
+	gene_id – Ensembl gene ID
+	gene_name – Human-readable gene symbol for the same gene.
+	gene_type – Gene biotype (e.g. `protein_coding`, `lncRNA`).
+	gene_strand – `+` or `-` strand of that gene on the genome.
+	junction_Start, junction_End – Genomic start/end coordinates of the splice junction
+	output_type – Modality being scored
+	track_name – Identifier for the track (assay + cell type / tissue)
+	track_strand – Strand of the track data if applicable (`+`, `-`, or `.` for unstranded).
+	Assay – High-level assay type, e.g. `ATAC-seq`, `DNase-seq`, `Histone ChIP-seq`, `polyA plus RNA-seq`, `PRO-cap`
+	ontology_curie – Ontology ID pointing to the cell type or tissue
+	biosample_name – Human-readable sample name
+	biosample_life_stage – Developmental/life-stage descriptor if available (e.g. `adult`, `fetal`; often `NaN` in current dumps)
+	data_source – Where the track came from
+	transcription_factor – For `CHIP_TF` tracks: name of the TF
+	histone_mark – For `CHIP_HISTONE` tracks: mark type
+	gtex_tissue – For GTEx RNA-seq tracks: the GTEx tissue label 
+	raw_score – The actual numeric effect size for this variant × track × scorer:
+		
+		- For gene-expression scorers: log fold-change in mean RNA coverage (ALT vs REF) over the gene body.
+			
+		- For center-mask (ATAC/TF/histone) scorers: log change (often log2 or log1p) in summed signal in the window around the variant.
+			
+		- For splicing scorers: Δ in splice-site usage, class probabilities, or junction counts, depending on the scorer.  
+			Sign gives direction (ALT up/down), magnitude is effect size.
+	quantile_score – Position of that `raw_score` in the empirical distribution for that scorer/track:
+
+
+The QUESTION: Is there anything unique for the pathogenic repeats in terms of the predicted consequence of expansion (2x, 5x, 20x)? 
+
+There is no answer in the current literature. So you have to develop your own hypotheses based on exploring the provided data files. 
+
+IMPORTANT: This is an exploratory analysis - do not limit yourself to obvious or simple comparisons. Consider:
+- Non-linear dose-response relationships across expansion levels (2x vs 5x vs 20x)
+- Combinatorial effects across multiple output_types (e.g., epigenetic AND splicing changes together)
+- Tissue-specific or cell-type-specific patterns in biosample_name
+- Differences in directionality of effects (sign of raw_score)
+- Interaction effects between different assay types
+- Threshold effects where pathogenic repeats cross critical boundaries
+- Temporal patterns if biosample_life_stage data is available
+- Gene-level properties (gene_type, gene_strand) that may modify repeat effects
+
+Think creatively about what makes a repeat "pathogenic" - it may not be a simple univariate difference.
+
+In addition to those listed above, feel free to explore other datasets to find plausible hypotheses.
+
+ANALYSIS REQUIREMENTS:
+
+1. EXPLORATORY PHASE: Thoroughly explore the data files to develop and test multiple diverse hypotheses that differentiate pathogenic repeats from non-pathogenic ones. For each hypothesis:
+   - State the hypothesis clearly before testing
+   - Perform appropriate statistical tests (with p-values, effect sizes, confidence intervals)
+   - Create visualizations that clearly show the evidence
+   - Critically evaluate whether the pattern is robust or could be spurious
+   - Consider confounding factors and alternative explanations
+   
+2. CANDIDATE IDENTIFICATION: Based on validated patterns from phase 1, identify candidate pathogenic genes that have 5'UTR CCG repeats which, when expanded, may cause diseases. For each candidate:
+   - Show quantitative evidence it matches the pathogenic signature
+   - Provide a mechanistic hypothesis for how it might cause disease
+   - Rank candidates by confidence level with supporting metrics
+
+3. STATISTICAL RIGOR: Ensure all conclusions are supported by:
+   - Appropriate statistical tests (t-tests, ANOVA, regression, etc.)
+   - Multiple testing correction where applicable (Bonferroni, FDR, etc.)
+   - Effect size measurements (Cohen's d, odds ratios, etc.)
+   - Confidence intervals or standard errors
+   - Cross-validation if building predictive models
+
+4. DELIVERABLE: Create a comprehensive Jupyter notebook (.ipynb file) that contains all analysis code supporting your final conclusions. The notebook should:
+   - Be well-organized with markdown cells explaining each analysis step and the rationale
+   - Include all data loading, preprocessing, exploratory analysis, statistical tests, and visualizations
+   - Document all hypotheses tested (including those that failed)
+   - Show the statistical evidence for each conclusion
+   - Be executable from top to bottom to reproduce your findings
+   - Save the notebook as "pathogenic_repeat_analysis.ipynb" in the current directory
+   - Use clear variable names and include detailed comments for complex operations
+   - Include a summary section at the end with key findings and their statistical support

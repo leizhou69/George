@@ -1,0 +1,9 @@
+This "B_Cat_TNR_5UTR_CCG.tsv" file lists all the CCG repeats in the 5'UTR regions of the human genome. The "LocusID" column has chromosome coordinates (hg38) of the repeats. the "GencodeGeneName" and "RefseqGeneId" columns have the gene name of ID that the CCG repeats is located in. 
+
+CCG repeats extension in 7 of these genes (ABCD3, DIP2B, XYLT1, GIPC1, LRP12, FMR1, AFF2) causes neuromuscular diseases. 
+
+The open questions is why CCG repeats in these seven genes, but not the many other genes that harbor CCG repeats cause diseases? In another word, what is (are) the shared characteristics of these 7 genes that distinguish them from most of the other genes in the .tsv file. 
+
+There is no answer in the current literatures. So you are encouraged to look into the sequence motif, epigenetic modification, gene expression, ... or other datasets in your data_lake to find plausible hypotheses.
+
+Please report all hypotheses that you feel reasonable. Rank them based on your confidence levels and report each one with a figure of figures that support the hypothesis. 

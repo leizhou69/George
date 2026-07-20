@@ -1,0 +1,48 @@
+TASK: Explore different genetic and genomic databases and test hypotheses.
+
+GOAL: Identify hypotheses that would explain why the CCG repeats in the 5'UTR of certain genes are pathogenic, while those in the 5'UTR of most other genes are not.
+
+DATA: 
+	(1) The "B_Cat_TNR_5UTR_CCG_masked.tsv" file contains all the CCG repeats in the 5'UTR regions of the human genome. 
+	- The "LocusID" column has chromosome coordinates (hg38) of the repeats, followed by the pattern of trinucleotide repeats. 
+	- The "GencodeGeneName" and "RefseqGeneId" columns have the gene name and gene ID of the gene where the repeats are located.
+	- The "GencodeTranscriptId" column is the specific transcript affected by the CCG repeats.	
+
+	(2) The "Genes_with_PathogenicCCGrepts.tsv" is a list of pathogenic genes whereby the CCG repeats in their 5' UTR are known to cause neuromuscular diseases.  
+
+
+The Open Question: Why do CCG repeats in the pathogenic genes, but not in many other genes that harbor CCG repeats, cause diseases? In other words, what are the shared characteristics of the pathogenic genes that distinguish them from most of the other genes in the first .tsv file? 
+
+1. There is no answer in the current literature. So you are encouraged to look into data sources to develop your own hypotheses. 
+
+In particular, consider the following data sources:
+1.1 Web/API sources:
+UCSC
+ReMap
+GEO
+dbSNP
+IUCN
+JASPAR
+Ensemble
+gnomAD
+RegulaomeDB
+
+1.2 Data-lake datasets   
+GTEx
+MSigDB
+miRDB/miRTarBase
+
+1.3 the submitted data file "B_Cat_TNR_5UTR_CCG_masked.tsv"
+
+In addition to those listed above, feel free to explore other datasets to find plausible hypotheses.
+
+For each datasource:
+1) Generate 3-5 different hypotheses to compare pathogenic genes vs. controls.
+2) For each hypothesis, evaluate the confidence.  
+3) Select the most promising paths to investigate further
+
+You may need to combine different data sources to come up with a really good hypothesis. 
+
+Please report all hypotheses that you feel are reasonable. Rank them based on your confidence levels and report each one with a figure to support the hypothesis. 
+
+2. Based on the hypotheses, identify candidate pathogenic genes that have 5'UTR CCG repeats that, when expanded, may cause diseases.

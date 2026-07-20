@@ -2,6 +2,8 @@
 data/
 output/
 db/ag_db/
+# symlink to the 15G local Biomni data-lake cache
+biomni_data_cache
 
 # Large / generated artifacts
 *.parquet
