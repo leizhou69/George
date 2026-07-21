@@ -390,3 +390,26 @@ derived Parquets (`per_variant_summary.parquet`, `atac_variant_stats.parquet`,
 **Conclusion**: pipeline runs end-to-end on `ag_db` alone; data faithful to
 source. Phase 6 gate satisfied. **Phase 7 (delete the 29 GB TSVs) awaits the
 user's explicit approval** — destructive, backups elsewhere.
+
+---
+
+## 2026-07-21 — Phase 6 comparison notebook (DB vs TSV parity, quantified)
+
+Built `analysis/CompareOutput_DBvsTSV.ipynb` (modelled on the old repo's
+`CompareOutput_March26.ipynb`; builder `analysis/_build_compare_nb.py`, keys
+copied to `analysis/Verifying_keys.txt`). Compares 5 experiments — George's new
+**DB** runs (s5, o4.8) vs the OLD **TSV** runs (s5, o4.8, same query/models, day
+before) vs an older `o4.6·TSV`. Executed; outputs in `analysis/comparisons/`
+(`comparison_report.md`, `experiment_scores.csv`, `overlap_shared_counts.csv`,
+`consensus_top_candidates.csv`, `overlap_heatmap.png`, `consensus_list.png`).
+
+**Results — parity holds strongly:**
+- **Key recovery**: all 5 runs recover **both YES loci (AFF2, GLS)**; points
+  130–150. New DB runs (o4.8=150, s5=130) sit in the same band as TSV (150/140/140).
+- **Overlap (top-50)**: same-model DB-vs-TSV = s5 **32**, o4.8 **38**; the
+  cross-model baseline (s5-vs-o4.8) = **31** (DB) / **38** (TSV). Backend swap
+  introduces **no more divergence than a model swap** → the DB is not a source
+  of drift.
+- **Consensus top-15**: CARM1, EXOC3, RHOT1 top the list (in 4–5/5 runs); both
+  YES keys land at #4 (AFF2) and #6 (GLS); Possible keys TMEM185A (#5),
+  BCLAF3 (#10) also surface. Biologically consistent across backends.
