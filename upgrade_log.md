@@ -4,10 +4,17 @@ Running record of migration work executed against `upgrade.md`. Newest last.
 
 ---
 
-## ⏸️ CURRENT STATE — paused 2026-07-21 after Phase 6 (DB run succeeded; parity reviewed). Phase 7 (delete TSVs) AWAITS USER GO.
+## ⏸️ CURRENT STATE — paused 2026-07-21 after Phase 7 (source TSVs deleted; pipeline runs on ag_db alone)
 
-**Done: Phases 1–6.** **Next: Phase 7 (destructive — needs explicit user
-approval)**: remove the three 29 GB source TSVs to reclaim ~87 GB.
+**Done: Phases 1–7.** **Next: Phase 8** — freeze the old `Biomni_Rpts_Ds` repo
+as an archive (add `README_ARCHIVED.md`, tag). George is fully self-contained.
+
+⚠️ **The three 29 GB source TSVs are now DELETED** (`data/5UTR/B_5UTR_all_GCN_
+{2x,5x,20x}AG.tsv`, ~86 GB reclaimed). The data lives only in the validated
+`data/ag_db/` (2.0 GB) now — re-running the ETL (`db/etl/etl.py`) is no longer
+possible without restoring the TSVs. `data/5UTR/` keeps the small catalog +
+pathogenic files. User approved deletion after being told no external raw-TSV
+backup could be verified (the validated ag_db is the preserved form).
 
 - **Phase 6 run**: `sbatch harness/slurm/512GB.sbatch` → job 37739580 COMPLETED
   in 15m57s, **2/2 experiments OK** (s5 + o4.8) in `output/July_20_2026/`.
@@ -417,3 +424,28 @@ day before) vs two older `o4.6·TSV` runs (Tmp0.7 + Tmp0.5). Executed; outputs i
 - **Consensus top-15**: RHOT1 (#1, in all 6), CARM1, EXOC3, TMEM185A (#4, all 6)
   top the list; both YES keys land at #5 (AFF2) and #8 (GLS); Possible keys
   TMEM185A/BCLAF3/NCOR2 also surface. Biologically consistent across backends.
+
+---
+
+## 2026-07-21 — Phase 7 DONE: source TSVs deleted (~86 GB reclaimed)
+
+With Phase 6 parity confirmed and quantified, and after explicitly flagging that
+**no external raw-TSV backup could be verified** (searched /orange/zhou + likely
+roots; only copies were in George; the old repo's data was mv'd here in Phase 3),
+the user approved deletion. Removed:
+`data/5UTR/B_5UTR_all_GCN_{2x,5x,20x}AG.tsv` (30,437,452,420 + 30,837,853,364 +
+30,853,300,168 B ≈ 86 GB). Kept the small `B_Cat_5UTR_GCNs_masked.tsv` +
+`B_5UTR_Pathogenic_GCN.txt`.
+
+**Checkpoint — pipeline runs on `ag_db` alone (PASS):**
+- `query_ag` returns correct per-expansion counts (2x=102,782,767, 5x=104,210,211,
+  20x=104,366,423) with the TSVs gone.
+- All harness `DATA_FILES` resolve (catalog, pathogenic, + the two dim Parquets);
+  none referenced the deleted TSVs.
+- Guarded `db/etl/validate.py` §3 (raw spot-check) to SKIP gracefully when the
+  raw TSV is absent — it passed pre-deletion; re-runs no longer error.
+
+**Data preservation note**: the raw scores now exist only inside `data/ag_db/`
+(validated bit-faithful in Phase 4). Re-running `db/etl/etl.py` requires the
+TSVs, so ETL is effectively frozen unless they're restored from an external
+backup. `db/query_ag.py` + the harness are unaffected.

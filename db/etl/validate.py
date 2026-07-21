@@ -76,33 +76,40 @@ print(f"\n  fact rows @2x: {tot2:,} (raw file: {RAW_2X_ROWS:,})")
 check("2x fact == raw 2x rows (no join drops)", tot2 == RAW_2X_ROWS)
 
 print("\n== 3. spot-check pathogenic locus (FMR1) @2x vs raw TSV ==")
-raw = (f"read_csv('{RAW_2X}', delim='\t', header=true, sample_size=-1, "
-       f"all_varchar=true, nullstr='')")
-raw_n = con.execute(
-    f"SELECT count(*) FROM {raw} WHERE original_variant_id = '{FMR1}'"
-).fetchone()[0]
-fact_n = con.execute(
-    f"""SELECT count(*) FROM '{FACT}' f
-        JOIN '{DIMS}/variants.parquet' v USING (variant_id)
-        WHERE v.locus_id = '{FMR1}' AND f.expansion = 2"""
-).fetchone()[0]
-print(f"  raw rows for {FMR1}: {raw_n:,}")
-print(f"  fact rows for {FMR1} @2x: {fact_n:,}")
-check("FMR1 row count matches raw", raw_n == fact_n and raw_n > 0)
+if not os.path.exists(RAW_2X):
+    # Phase 7 removes the raw TSVs; the raw-vs-fact spot-check is only possible
+    # while they exist. It already passed pre-deletion (see upgrade_log.md), so
+    # skip rather than fail once the source is gone.
+    print(f"  SKIPPED — raw TSV '{RAW_2X}' not present (removed in Phase 7). "
+          f"This cross-check passed before deletion; see upgrade_log.md.")
+else:
+    raw = (f"read_csv('{RAW_2X}', delim='\t', header=true, sample_size=-1, "
+           f"all_varchar=true, nullstr='')")
+    raw_n = con.execute(
+        f"SELECT count(*) FROM {raw} WHERE original_variant_id = '{FMR1}'"
+    ).fetchone()[0]
+    fact_n = con.execute(
+        f"""SELECT count(*) FROM '{FACT}' f
+            JOIN '{DIMS}/variants.parquet' v USING (variant_id)
+            WHERE v.locus_id = '{FMR1}' AND f.expansion = 2"""
+    ).fetchone()[0]
+    print(f"  raw rows for {FMR1}: {raw_n:,}")
+    print(f"  fact rows for {FMR1} @2x: {fact_n:,}")
+    check("FMR1 row count matches raw", raw_n == fact_n and raw_n > 0)
 
-# score value cross-check: compare RNA_SEQ raw_score sum (rounded) raw vs fact
-raw_sum = con.execute(
-    f"""SELECT round(sum(TRY_CAST(raw_score AS DOUBLE)), 4) FROM {raw}
-        WHERE original_variant_id = '{FMR1}' AND output_type = 'RNA_SEQ'"""
-).fetchone()[0]
-fact_sum = con.execute(
-    f"""SELECT round(sum(f.raw_score), 4) FROM '{FACT}' f
-        JOIN '{DIMS}/variants.parquet' v USING (variant_id)
-        WHERE v.locus_id = '{FMR1}' AND f.expansion = 2
-          AND f.output_type = 'RNA_SEQ'"""
-).fetchone()[0]
-print(f"  RNA_SEQ raw_score sum  raw={raw_sum}  fact={fact_sum}")
-check("FMR1 RNA_SEQ score sum matches", raw_sum == fact_sum)
+    # score value cross-check: compare RNA_SEQ raw_score sum (rounded) raw vs fact
+    raw_sum = con.execute(
+        f"""SELECT round(sum(TRY_CAST(raw_score AS DOUBLE)), 4) FROM {raw}
+            WHERE original_variant_id = '{FMR1}' AND output_type = 'RNA_SEQ'"""
+    ).fetchone()[0]
+    fact_sum = con.execute(
+        f"""SELECT round(sum(f.raw_score), 4) FROM '{FACT}' f
+            JOIN '{DIMS}/variants.parquet' v USING (variant_id)
+            WHERE v.locus_id = '{FMR1}' AND f.expansion = 2
+              AND f.output_type = 'RNA_SEQ'"""
+    ).fetchone()[0]
+    print(f"  RNA_SEQ raw_score sum  raw={raw_sum}  fact={fact_sum}")
+    check("FMR1 RNA_SEQ score sum matches", raw_sum == fact_sum)
 
 print("\n== 4. score ranges ==")
 for e, rmin, rmax, qmin, qmax, nnull in con.execute(
