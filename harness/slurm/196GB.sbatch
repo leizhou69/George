@@ -9,10 +9,12 @@
 #SBATCH --time=24:00:00
 #SBATCH --qos=zhou-b 
 
+# Run from the George project root regardless of where sbatch was submitted.
+cd /blue/zhou/leizhou/Agents/George
+
 ml conda
 
 conda activate biomni_e1
 
-# Submit from the George project root:  sbatch harness/slurm/196GB.sbatch
 mkdir -p output
 python harness/run_biomni.py 2>&1 | tee output/run_$(date +%Y%m%d-%H%M%S).log

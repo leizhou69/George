@@ -4,10 +4,21 @@ Running record of migration work executed against `upgrade.md`. Newest last.
 
 ---
 
-## ⏸️ CURRENT STATE — paused 2026-07-21 after Phase 5 (harness wired to the DB)
+## ⏸️ CURRENT STATE — paused 2026-07-21; Phase 6 run NEEDS RESUBMIT (first attempt failed on submit-dir)
 
-**Done: Phases 1, 2, 3, 4, 5 (code).** **Next: Phase 6** — a real 5'UTR agent
-run against the DB backend, then confirm parity with the prior TSV-based results.
+**Done: Phases 1–5.** **Next: Phase 6** — the first agent-run submit
+(job 37739070) FAILED IN 5s and must be resubmitted; then confirm parity.
+
+⚠️ **The Phase 6 agent has NOT run yet.** `sbatch harness/slurm/512GB.sbatch`
+was submitted from `harness/slurm/`, so `python harness/run_biomni.py` resolved
+to `harness/slurm/harness/run_biomni.py` → "No such file". The agent never
+started (no output/, no API calls). **Fixed**: both `harness/slurm/*.sbatch` now
+`cd /blue/.../George` first, so submit-dir no longer matters.
+
+**To resume Phase 6**: `sbatch harness/slurm/512GB.sbatch` (from anywhere now).
+It runs s5 + o4.8 into `output/July_20_2026/`. Watch `squeue`; a real run takes
+hours (not seconds). Then compare candidate output vs the prior
+`results/Top_Candidate_Pathogenic_repeats.csv` for parity (Phase 6 gate).
 
 - Repo now has a GitHub remote `origin`
   (https://github.com/leizhou69/George.git); `main` pushed (Phases 1–4 + the
@@ -327,3 +338,20 @@ remote's LICENSE init commit (`--allow-unrelated-histories`), pushed `main`.
 issues SQL via `query_ag`) and Phase 6 (full 5'UTR run + parity vs prior TSV
 results). Left to the user to launch (`sbatch harness/slurm/512GB.sbatch` or
 `python harness/run_biomni.py s5 o4.8`). Source TSVs still untouched (Phase 7).
+
+---
+
+## 2026-07-21 — Phase 6 attempt #1 FAILED (submit-dir); sbatch scripts fixed
+
+User submitted `harness/slurm/512GB.sbatch` — job 37739070 (s5+o4.8, 48 CPU /
+420 GB) **exited in 5s**: it was submitted from `harness/slurm/`, so
+`python harness/run_biomni.py` looked for `harness/slurm/harness/run_biomni.py`
+("No such file or directory"). The agent never ran — no `output/`, no API spend.
+
+**Fix**: added `cd /blue/zhou/leizhou/Agents/George` to the top (post-`#SBATCH`)
+of **both** `harness/slurm/512GB.sbatch` and `196GB.sbatch`, so relative paths
+resolve regardless of submit dir (same fix already in `db/etl/build_ag_db.sbatch`).
+Neither uses `set -u`, so the conda/MKL trap doesn't apply here.
+
+**Still pending**: resubmit `sbatch harness/slurm/512GB.sbatch` for the real
+Phase 6 run, then parity check vs `results/Top_Candidate_Pathogenic_repeats.csv`.
