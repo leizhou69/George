@@ -4,11 +4,22 @@ Running record of migration work executed against `upgrade.md`. Newest last.
 
 ---
 
-## ⏸️ CURRENT STATE — paused 2026-07-21 after Phase 4 (backend built + validated)
+## ⏸️ CURRENT STATE — paused 2026-07-21 after Phase 5 (harness wired to the DB)
 
-**Done: Phases 1, 2, 3, 4.** **Next: Phase 5** — wire `query_ag` into
-`run_biomni.py` (drop the 3 giant AG TSVs from `DATA_FILES`, register the tool,
-add the schema/example block to the prompt).
+**Done: Phases 1, 2, 3, 4, 5 (code).** **Next: Phase 6** — a real 5'UTR agent
+run against the DB backend, then confirm parity with the prior TSV-based results.
+
+- Repo now has a GitHub remote `origin`
+  (https://github.com/leizhou69/George.git); `main` pushed (Phases 1–4 + the
+  remote's initial LICENSE commit merged in). Phase 5 commit follows.
+- **Phase 5 done in `harness/run_biomni.py`**: dropped the 3 giant AG TSVs from
+  `DATA_FILES` (added the small `variants`/`tracks` dim Parquets instead);
+  `agent.add_tool(query_ag)` per experiment; prompt augmented with a
+  "use query_ag, don't read TSVs" block + `schema_doc()`. `AG_DB` resolved to an
+  absolute path at import (harness chdir's into output dirs at runtime).
+- Verified without an LLM: compiles, `--help` OK, all 4 `DATA_FILES` resolve,
+  `schema_doc()` = 4251 chars w/ live columns, and `query_ag` works + materializes
+  correctly even when cwd is a temp/output dir (the chdir case).
 
 - **`data/ag_db/`** built (2.0 GB, gitignored): dims + `ag_scores` partitioned by
   region/expansion/output_type. ~311M fact rows (2x=102,782,767, 5x=104,210,211,
@@ -285,3 +296,34 @@ conda's activate.d; fixed by activating before `set -eo pipefail` (no `-u`) and
 - `to_file=` materialize: 73,014-row per-variant table → Parquet, head returned.
 
 **Next: Phase 5** — wire `query_ag` into `run_biomni.py`.
+
+---
+
+## 2026-07-21 — Phase 5 DONE: harness rewired to the DB backend
+
+Edited `harness/run_biomni.py` so the agent reaches AlphaGenome via `query_ag`
+instead of loading TSVs:
+- **`DATA_FILES`**: removed `AG_Predicted_{2x,5x,20x}_expansion` (the three
+  ~30 GB TSVs); kept `Pathogenic_repeats` + `All_5UTR_GCN_catalog`; added the
+  small browsable dim Parquets `AG_variants_dim`, `AG_tracks_dim`.
+- **Tool registration**: `from query_ag import query_ag` (with
+  `sys.path.insert` of `db/`), and `agent.add_tool(query_ag)` in
+  `run_single_experiment` after `add_data`.
+- **Prompt**: append an "AlphaGenome data access — REQUIRED METHOD" block (use
+  `query_ag`, 1k-row cap is payload-only so aggregate; `to_file` for big
+  derived tables; don't read raw TSVs) + `schema_doc()`.
+- **cwd fix**: `os.environ.setdefault("AG_DB", <abs path>)` before importing
+  query_ag, because `run_single_experiment` chdir's into each output dir — a
+  relative `data/ag_db` would break there.
+
+**Verification (no LLM):** py_compile OK; `--help` OK; the 4 `DATA_FILES` all
+resolve; `schema_doc()` returns 4251 chars incl. a live column listing;
+`query_ag` returns correct per-expansion counts (2x=102,782,767 etc.) AND
+materializes to a relative path **while cwd is a temp dir** — proving the chdir
+integration. Also published: `git remote add origin …/George.git`, merged the
+remote's LICENSE init commit (`--allow-unrelated-histories`), pushed `main`.
+
+**Not done (needs API / LLM):** Phase 5's dry-run checkpoint (agent actually
+issues SQL via `query_ag`) and Phase 6 (full 5'UTR run + parity vs prior TSV
+results). Left to the user to launch (`sbatch harness/slurm/512GB.sbatch` or
+`python harness/run_biomni.py s5 o4.8`). Source TSVs still untouched (Phase 7).

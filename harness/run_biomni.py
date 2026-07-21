@@ -22,6 +22,15 @@ from biomni.agent import A1
 from biomni.config import default_config
 from biomni.llm import _anthropic_rejects_sampling_params
 
+# AlphaGenome backend query tool (db/query_ag.py). Resolve the DuckDB backend to
+# an ABSOLUTE path and export it before importing query_ag: run_single_experiment
+# chdir's into each per-experiment output dir, so query_ag's default relative
+# "data/ag_db" would otherwise not resolve. query_ag reads $AG_DB at import time.
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+os.environ.setdefault("AG_DB", str(_REPO_ROOT / "data" / "ag_db"))
+sys.path.insert(0, str(_REPO_ROOT / "db"))
+from query_ag import query_ag, schema_doc as ag_schema_doc
+
 
 def _model_ignores_temperature(model_name: str) -> bool:
     """Whether sweeping temperature is meaningless for this model.
@@ -82,13 +91,16 @@ TEMPERATURES = [0.5,0.7, 0.9]
 TIMEOUT_SECONDS = 12000
 TIMEOUT_ID = "200m"  # Short ID for output filename
 
-# Data files to register with agent
+# Data files to register with agent.
+# The three ~30 GB AG TSVs are NO LONGER registered — the ~311M AlphaGenome
+# rows now live in the DuckDB/Parquet backend (data/ag_db/) and are reached via
+# the `query_ag` tool (registered per-experiment; see run_single_experiment).
+# Small files stay registered as-is; the dim Parquets are small + browsable.
 DATA_FILES = {
     "Pathogenic_repeats": "data/5UTR/B_5UTR_Pathogenic_GCN.txt",
     "All_5UTR_GCN_catalog": "data/5UTR/B_Cat_5UTR_GCNs_masked.tsv",
-    "AG_Predicted_2x_expansion": "data/5UTR/B_5UTR_all_GCN_2xAG.tsv",
-    "AG_Predicted_5x_expansion": "data/5UTR/B_5UTR_all_GCN_5xAG.tsv",
-    "AG_Predicted_20x_expansion": "data/5UTR/B_5UTR_all_GCN_20xAG.tsv",
+    "AG_variants_dim": "data/ag_db/dims/variants.parquet",
+    "AG_tracks_dim": "data/ag_db/dims/tracks.parquet",
 }
 
 # ============================================================================
@@ -146,7 +158,11 @@ def run_single_experiment(llm_name, llm_id, temperature, query_path, prompt, out
                 name: f"Custom dataset at {(Path(original_cwd) / path).resolve()}"
                 for name, path in DATA_FILES.items()
             })
-            
+
+            # Register the AlphaGenome query tool. The agent hits the ~311M-row
+            # DuckDB backend with SQL via query_ag() instead of loading TSVs.
+            agent.add_tool(query_ag)
+
             # Run query
             print("Starting agent query execution...")
             agent.go(prompt)
@@ -285,6 +301,27 @@ Examples:
         sys.exit(1)
 
     prompt = query_path.read_text(encoding="utf-8")
+
+    # Append AlphaGenome backend guidance: the agent must use query_ag (SQL over
+    # the DuckDB/Parquet backend), NOT read the raw 30 GB TSVs (which are no
+    # longer registered). schema_doc() also appends a live column listing.
+    ag_block = (
+        "\n\n"
+        "================================================================\n"
+        "AlphaGenome data access — REQUIRED METHOD\n"
+        "================================================================\n"
+        "The AlphaGenome expansion predictions (~311M rows) are NOT provided as\n"
+        "readable TSVs. Use the registered `query_ag` tool to run SQL:\n\n"
+        "    query_ag(sql, to_file=None) -> pandas.DataFrame\n\n"
+        "- Default (inspect) mode returns at most 1000 rows. The cap is only on\n"
+        "  rows returned to you — DuckDB scans ALL rows, so use GROUP BY / AVG /\n"
+        "  COUNT to compute over the full dataset and get compact results.\n"
+        "- For large per-row derived tables, pass to_file='name.parquet' to write\n"
+        "  the full result, then read back only summaries/head.\n"
+        "- Do NOT try to read the raw AG TSVs; query the backend instead.\n\n"
+        + ag_schema_doc()
+    )
+    prompt = prompt + ag_block
 
     # Calculate total experiments (models that ignore temperature run only once)
     total_experiments = sum(
