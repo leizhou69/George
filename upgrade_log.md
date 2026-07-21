@@ -4,17 +4,21 @@ Running record of migration work executed against `upgrade.md`. Newest last.
 
 ---
 
-## ⏸️ CURRENT STATE — paused 2026-07-21 after Phase 7 (source TSVs deleted; pipeline runs on ag_db alone)
+## ✅ CURRENT STATE — 2026-07-21: MIGRATION COMPLETE (Phases 1–8 done)
 
-**Done: Phases 1–7.** **Next: Phase 8** — freeze the old `Biomni_Rpts_Ds` repo
-as an archive (add `README_ARCHIVED.md`, tag). George is fully self-contained.
+**All 8 phases done.** George + biomni-fork are the live repos; `Biomni_Rpts_Ds`
+is archived (tag `archive-pre-migration`, commit `66e7d5f`, pushed).
 
-⚠️ **The three 29 GB source TSVs are now DELETED** (`data/5UTR/B_5UTR_all_GCN_
-{2x,5x,20x}AG.tsv`, ~86 GB reclaimed). The data lives only in the validated
-`data/ag_db/` (2.0 GB) now — re-running the ETL (`db/etl/etl.py`) is no longer
-possible without restoring the TSVs. `data/5UTR/` keeps the small catalog +
-pathogenic files. User approved deletion after being told no external raw-TSV
-backup could be verified (the validated ag_db is the preserved form).
+⚠️ **The three 29 GB source TSVs are DELETED** (Phase 7, ~86 GB reclaimed); data
+lives only in the validated `data/ag_db/` (2.0 GB). Re-running `db/etl/etl.py`
+needs the TSVs restored. `data/5UTR/` keeps the small catalog + pathogenic files.
+
+**One remaining soft tie (non-blocking):** `George/biomni_data_cache` is still a
+**symlink** into `Biomni_Rpts_Ds/biomni_data_cache` (15 GB data lake). It keeps
+working because the archived repo persists (archiving ≠ deletion). To make George
+100% self-contained, `mv` that cache into George and drop the symlink (instant,
+same mount) — left as an optional finalization since the archived repo's
+`README_ARCHIVED.md` currently documents the cache as living there.
 
 - **Phase 6 run**: `sbatch harness/slurm/512GB.sbatch` → job 37739580 COMPLETED
   in 15m57s, **2/2 experiments OK** (s5 + o4.8) in `output/July_20_2026/`.
@@ -449,3 +453,29 @@ the user approved deletion. Removed:
 (validated bit-faithful in Phase 4). Re-running `db/etl/etl.py` requires the
 TSVs, so ETL is effectively frozen unless they're restored from an external
 backup. `db/query_ag.py` + the harness are unaffected.
+
+---
+
+## 2026-07-21 — Phase 8 DONE: old repo frozen as archive. MIGRATION COMPLETE.
+
+Archived `$OLD = Biomni_Rpts_Ds`:
+- Added `$OLD/README_ARCHIVED.md` (points to George + biomni-fork; what changed;
+  what remains) and an archive banner atop `$OLD/README.md`.
+- Committed the migration docs there too (`upgrade.md`, `upgrade_log.md`).
+- Commit **`66e7d5f`** "Archive: superseded by George + biomni-fork"; annotated
+  tag **`archive-pre-migration`**; pushed main + tag to
+  github.com/leizhou69/Biomni_Rpts_Ds.
+- Left the ~292 GB `Rpt_Ds/output/` run history in place (provenance).
+
+**Checkpoint**: George runs fully on its own `data/` + `data/ag_db/`; the only
+remaining link to `$OLD` is the `biomni_data_cache` symlink (still valid — the
+archive persists). Optional final detach = `mv` the cache into George.
+
+**Post-migration checklist (upgrade.md) — status:**
+- ✅ `import biomni` → biomni-fork from any cwd.
+- ✅ `run_biomni.py` runs from George, no `sys.path.append`.
+- ✅ Agent queries AG via `query_ag` (no 29 GB reads; verified Phase 6).
+- ✅ 5'UTR parity confirmed; source TSVs removed; ~86 GB reclaimed.
+- ✅ `$OLD` tagged/archived; George + biomni-fork are the live repos.
+- ⬜ 3'UTR onboarding (future; `db/etl/etl.py` is env-parameterized for it, but
+     needs 3'UTR AG TSVs + catalog to run).
