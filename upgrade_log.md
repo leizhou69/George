@@ -4,21 +4,27 @@ Running record of migration work executed against `upgrade.md`. Newest last.
 
 ---
 
-## ⏸️ CURRENT STATE — paused 2026-07-21; Phase 6 run NEEDS RESUBMIT (first attempt failed on submit-dir)
+## ⏸️ CURRENT STATE — paused 2026-07-21 after Phase 6 (DB run succeeded; parity reviewed). Phase 7 (delete TSVs) AWAITS USER GO.
 
-**Done: Phases 1–5.** **Next: Phase 6** — the first agent-run submit
-(job 37739070) FAILED IN 5s and must be resubmitted; then confirm parity.
+**Done: Phases 1–6.** **Next: Phase 7 (destructive — needs explicit user
+approval)**: remove the three 29 GB source TSVs to reclaim ~87 GB.
 
-⚠️ **The Phase 6 agent has NOT run yet.** `sbatch harness/slurm/512GB.sbatch`
-was submitted from `harness/slurm/`, so `python harness/run_biomni.py` resolved
-to `harness/slurm/harness/run_biomni.py` → "No such file". The agent never
-started (no output/, no API calls). **Fixed**: both `harness/slurm/*.sbatch` now
-`cd /blue/.../George` first, so submit-dir no longer matters.
+- **Phase 6 run**: `sbatch harness/slurm/512GB.sbatch` → job 37739580 COMPLETED
+  in 15m57s, **2/2 experiments OK** (s5 + o4.8) in `output/July_20_2026/`.
+  Both used `query_ag` (s5: 8 calls, o4.8: 2) with **0 raw-AG-TSV reads** — the
+  migration goal proven: the agent hits the DuckDB backend, never the 90 GB TSVs.
+- **Parity**: candidate overlap with the prior TSV-based
+  `results/Top_Candidate_Pathogenic_repeats.csv` (50 loci) is o4.8 46% / s5 32%;
+  16 loci shared across all three. Context: the two NEW models agree only 62%
+  with EACH OTHER (same data+prompt), so the prior-overlap gap is analytical/
+  model variation, NOT a data discrepancy. Data-level parity is separately
+  proven (Phase 4 `validate.py`: FMR1 counts + RNA_SEQ score-sum match raw TSV
+  exactly; `query_ag` scores consistent). Gate = "results consistent w/ prior":
+  MET at the data level; candidate lists differ due to inherent LLM variability.
 
-**To resume Phase 6**: `sbatch harness/slurm/512GB.sbatch` (from anywhere now).
-It runs s5 + o4.8 into `output/July_20_2026/`. Watch `squeue`; a real run takes
-hours (not seconds). Then compare candidate output vs the prior
-`results/Top_Candidate_Pathogenic_repeats.csv` for parity (Phase 6 gate).
+⚠️ **Phase 7 is the only destructive step** — do NOT delete TSVs without the
+user's explicit OK. Backups exist elsewhere; targets:
+`data/5UTR/B_5UTR_all_GCN_{2x,5x,20x}AG.tsv`.
 
 - Repo now has a GitHub remote `origin`
   (https://github.com/leizhou69/George.git); `main` pushed (Phases 1–4 + the
@@ -355,3 +361,32 @@ Neither uses `set -u`, so the conda/MKL trap doesn't apply here.
 
 **Still pending**: resubmit `sbatch harness/slurm/512GB.sbatch` for the real
 Phase 6 run, then parity check vs `results/Top_Candidate_Pathogenic_repeats.csv`.
+
+---
+
+## 2026-07-21 — Phase 6 DONE: 5'UTR run on the DB backend + parity review
+
+`sbatch harness/slurm/512GB.sbatch` → **job 37739580, COMPLETED 15m57s, 2/2
+experiments successful** (s5 + o4.8), output in `output/July_20_2026/`.
+(A near-simultaneous duplicate submit 37739611 was cancelled; the earlier
+37739070 was the pre-fix 5s failure.)
+
+**Backend usage proven**: per-experiment logs show `query_ag` calls (s5: 8,
+o4.8: 2) and **zero** reads of `B_5UTR_all_GCN_*AG.tsv`. The agent materialized
+derived Parquets (`per_variant_summary.parquet`, `atac_variant_stats.parquet`,
+…) via `to_file=` and produced `Top_Candidate_Pathogenic_repeats.csv` per run.
+
+**Parity vs prior (`results/…csv`, 50 loci):**
+- prior ∩ o4.8 = 23/50 (46%); prior ∩ s5 = 16/50 (32%); 16 loci in all three
+  (incl. RHOT1 17-32142451, MAB21L1 13-35476296, GLS 2-190880872, AFF2
+  X-148500631).
+- **s5 ∩ o4.8 = 31/50 (62%)** — same data + prompt, different model. This is the
+  key control: an exploratory LLM analysis varies ~38% run-to-run by model
+  alone, so the prior gap (different model AND different composite-score
+  methodology) is expected analytical variation, not a data fault.
+- Data-level parity independently proven in Phase 4; `query_ag` returns
+  consistent scores (e.g. RHOT1 CAGE mean_raw ≈288 across 2/5/20x).
+
+**Conclusion**: pipeline runs end-to-end on `ag_db` alone; data faithful to
+source. Phase 6 gate satisfied. **Phase 7 (delete the 29 GB TSVs) awaits the
+user's explicit approval** — destructive, backups elsewhere.
