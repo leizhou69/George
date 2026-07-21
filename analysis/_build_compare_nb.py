@@ -55,8 +55,10 @@ EXPERIMENTS = [
          glob=str(OLD  / 'output/July_20_2026/q05b_s5_*'   / TARGET_CSV)),
     dict(label='o4.8 · TSV',model='o4.8', backend='TSV',
          glob=str(OLD  / 'output/July_20_2026/q05b_o4.8_*' / TARGET_CSV)),
-    dict(label='o4.6 · TSV',model='o4.6', backend='TSV',
+    dict(label='o4.6·T.7 · TSV', model='o4.6', backend='TSV',
          glob=str(OLD  / 'output/March_26_B/q05_o4.6_Tmp0.7_200m_20260328-023529' / TARGET_CSV)),
+    dict(label='o4.6·T.5 · TSV', model='o4.6', backend='TSV',
+         glob=str(OLD  / 'output/March_26_B/q05_o4.6_Tmp0.5_200m_20260328-015431' / TARGET_CSV)),
 ]
 
 # Resolve globs -> concrete paths (report any missing).

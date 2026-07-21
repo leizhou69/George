@@ -397,19 +397,23 @@ user's explicit approval** — destructive, backups elsewhere.
 
 Built `analysis/CompareOutput_DBvsTSV.ipynb` (modelled on the old repo's
 `CompareOutput_March26.ipynb`; builder `analysis/_build_compare_nb.py`, keys
-copied to `analysis/Verifying_keys.txt`). Compares 5 experiments — George's new
-**DB** runs (s5, o4.8) vs the OLD **TSV** runs (s5, o4.8, same query/models, day
-before) vs an older `o4.6·TSV`. Executed; outputs in `analysis/comparisons/`
-(`comparison_report.md`, `experiment_scores.csv`, `overlap_shared_counts.csv`,
-`consensus_top_candidates.csv`, `overlap_heatmap.png`, `consensus_list.png`).
+copied to `analysis/Verifying_keys.txt`). Compares **6 experiments** — George's
+new **DB** runs (s5, o4.8) vs the OLD **TSV** runs (s5, o4.8, same query/models,
+day before) vs two older `o4.6·TSV` runs (Tmp0.7 + Tmp0.5). Executed; outputs in
+`analysis/comparisons/` (`comparison_report.md`, `experiment_scores.csv`,
+`overlap_shared_counts.csv`, `consensus_top_candidates.csv`,
+`overlap_heatmap.png`, `consensus_list.png`).
 
 **Results — parity holds strongly:**
-- **Key recovery**: all 5 runs recover **both YES loci (AFF2, GLS)**; points
-  130–150. New DB runs (o4.8=150, s5=130) sit in the same band as TSV (150/140/140).
+- **Key recovery**: both new DB runs + s5/o4.8/o4.6-T.7 TSV recover **both YES
+  loci (AFF2, GLS)**; points 130–150. DB runs (o4.8=150, s5=130) sit in the same
+  band as TSV. (Outlier: the older `o4.6·T.5` TSV run recovered 0 YES keys / 40
+  pts — a property of that specific run, not the backend.)
 - **Overlap (top-50)**: same-model DB-vs-TSV = s5 **32**, o4.8 **38**; the
-  cross-model baseline (s5-vs-o4.8) = **31** (DB) / **38** (TSV). Backend swap
-  introduces **no more divergence than a model swap** → the DB is not a source
-  of drift.
-- **Consensus top-15**: CARM1, EXOC3, RHOT1 top the list (in 4–5/5 runs); both
-  YES keys land at #4 (AFF2) and #6 (GLS); Possible keys TMEM185A (#5),
-  BCLAF3 (#10) also surface. Biologically consistent across backends.
+  cross-model baseline (s5-vs-o4.8) = **31** (DB) / **38** (TSV); even same-model
+  same-backend temperature swap (o4.6 T.7-vs-T.5) = **30**. Backend swap
+  introduces **no more divergence than a model or temperature swap** → the DB is
+  not a source of drift.
+- **Consensus top-15**: RHOT1 (#1, in all 6), CARM1, EXOC3, TMEM185A (#4, all 6)
+  top the list; both YES keys land at #5 (AFF2) and #8 (GLS); Possible keys
+  TMEM185A/BCLAF3/NCOR2 also surface. Biologically consistent across backends.
