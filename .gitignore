@@ -9,6 +9,8 @@ biomni_data_cache
 *.parquet
 *.tsv
 *.duckdb
+db/etl/duck_tmp/
+db/etl/sample/
 
 # Secrets
 .env
