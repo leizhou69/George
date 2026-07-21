@@ -4,21 +4,27 @@ Running record of migration work executed against `upgrade.md`. Newest last.
 
 ---
 
-## ✅ CURRENT STATE — 2026-07-21: MIGRATION COMPLETE (Phases 1–8 done)
+## ✅ CURRENT STATE — 2026-07-21: MIGRATION COMPLETE (Phases 1–8) + George fully detached
 
-**All 8 phases done.** George + biomni-fork are the live repos; `Biomni_Rpts_Ds`
-is archived (tag `archive-pre-migration`, commit `66e7d5f`, pushed).
+**All 8 phases done; George is now 100% self-contained** — no remaining ties to
+`Biomni_Rpts_Ds`. George + biomni-fork are the live repos; `Biomni_Rpts_Ds` is
+archived (tag `archive-pre-migration`, commit `66e7d5f`, pushed).
 
 ⚠️ **The three 29 GB source TSVs are DELETED** (Phase 7, ~86 GB reclaimed); data
 lives only in the validated `data/ag_db/` (2.0 GB). Re-running `db/etl/etl.py`
 needs the TSVs restored. `data/5UTR/` keeps the small catalog + pathogenic files.
 
-**One remaining soft tie (non-blocking):** `George/biomni_data_cache` is still a
-**symlink** into `Biomni_Rpts_Ds/biomni_data_cache` (15 GB data lake). It keeps
-working because the archived repo persists (archiving ≠ deletion). To make George
-100% self-contained, `mv` that cache into George and drop the symlink (instant,
-same mount) — left as an optional finalization since the archived repo's
-`README_ARCHIVED.md` currently documents the cache as living there.
+**`biomni_data_cache` detached (done):** the 15 GB data lake was `mv`'d out of
+`Biomni_Rpts_Ds` into `George/biomni_data_cache` (now a real dir, 76 lake files,
+gitignored) and the symlink dropped. George no longer depends on the archived
+repo for anything. The archive's `README_ARCHIVED.md` was updated to note the
+cache moved out.
+
+**Only open item is future work, not migration:** 3'UTR onboarding (the ETL is
+env-parameterized for it; needs 3'UTR AG TSVs + catalog).
+
+**Remote-control note:** `/remote-control` (phone monitoring) requires Claude for
+Enterprise; this setup uses API-key access, so monitor via SSH + `tmux attach`.
 
 - **Phase 6 run**: `sbatch harness/slurm/512GB.sbatch` → job 37739580 COMPLETED
   in 15m57s, **2/2 experiments OK** (s5 + o4.8) in `output/July_20_2026/`.
@@ -470,6 +476,21 @@ Archived `$OLD = Biomni_Rpts_Ds`:
 **Checkpoint**: George runs fully on its own `data/` + `data/ag_db/`; the only
 remaining link to `$OLD` is the `biomni_data_cache` symlink (still valid — the
 archive persists). Optional final detach = `mv` the cache into George.
+
+---
+
+## 2026-07-21 — Cache detached: George fully severed from the archive
+
+Finalized the last follow-up. `mv`'d the 15 GB Biomni data-lake cache out of
+`Biomni_Rpts_Ds/biomni_data_cache` into `George/biomni_data_cache` (dropped
+George's symlink first so `mv` didn't follow it into the old repo; same
+`/blue/zhou` mount → instant rename). Verified: George's cache is a real dir with
+76/76 lake files, the old repo's copy is gone, no symlinks remain in George, and
+`biomni_data_cache` stays gitignored. Updated `CLAUDE.md` (layout + gotcha #5) and
+the archive's `README_ARCHIVED.md`. `git grep` confirms no tracked runtime
+reference to `Biomni_Rpts_Ds` (only migration prose + the comparison notebook's
+deliberate read of archived outputs). **George now runs with zero dependency on
+the archived repo.**
 
 **Post-migration checklist (upgrade.md) — status:**
 - ✅ `import biomni` → biomni-fork from any cwd.

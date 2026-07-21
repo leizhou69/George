@@ -33,7 +33,7 @@ manuscript/5UTR_TNR_0605.pdf
 results/Top_Candidate_Pathogenic_repeats.csv
 data/  (gitignored)            5UTR/ + 3UTR/ region files; ag_db/ (Phase 4)
 output/ (gitignored)           run outputs
-biomni_data_cache -> …         symlink to the 15G local Biomni data lake (76 files)
+biomni_data_cache/             the 15G local Biomni data lake (76 files); gitignored
 archive/                       superseded queries/notebooks
 ```
 
@@ -85,9 +85,9 @@ gemini/grok keys. Source auto-detected from the model-name prefix in
 4. **Working-directory side effect.** `run_single_experiment` `os.chdir`es into
    the per-experiment output dir (restored in `finally`); that's why `DATA_FILES`
    are resolved to absolute paths against `original_cwd` (the repo root).
-5. **`biomni_data_cache` is a symlink** into the old repo. George is otherwise
-   self-contained (its `data/` is a real dir). To fully detach, `mv` the cache
-   here (same mount → instant) and drop the symlink.
+5. **`biomni_data_cache` is now a real local dir** (76 lake files), `mv`'d in
+   from the old repo — George is fully self-contained with no dependency on
+   `Biomni_Rpts_Ds` (which is archived). It stays gitignored.
 
 ## Output layout
 `output/<QUERYID>_<modelkey>_Tmp<temp>_<timeoutid>_<timestamp>/` with
