@@ -1,0 +1,35 @@
+[
+  {
+    "region": "5UTR",
+    "repeat_type": "TNR",
+    "notes": "5-prime UTR trinucleotide repeats (masked catalog)",
+    "catalog": "data/5UTR/B_Cat_5UTR_msk_TNR.tsv",
+    "ag": {
+      "2": "data/5UTR/B_5UTR_TNR_2xAG.sout.tsv",
+      "5": "data/5UTR/B_5UTR_TNR_5xAG.sout.tsv",
+      "20": "data/5UTR/B_5UTR_TNR_20xAG.sout.tsv"
+    }
+  },
+  {
+    "region": "CDS",
+    "repeat_type": "TNR",
+    "notes": "coding-sequence trinucleotide repeats (masked catalog)",
+    "catalog": "data/CDS/B_Cat_CDS_msk_TNR.tsv",
+    "ag": {
+      "2": "data/CDS/B_TNR_msk_CDS_2xAG.out.tsv",
+      "5": "data/CDS/B_TNR_msk_CDS_5xAG.out.tsv",
+      "20": "data/CDS/B_TNR_msk_CDS_20xAG.out.tsv"
+    }
+  },
+  {
+    "region": "3UTR",
+    "repeat_type": "TNR",
+    "notes": "3-prime UTR trinucleotide repeats (masked catalog)",
+    "catalog": "data/3UTR/B_Cat_3UTR_msk_TNR.tsv",
+    "ag": {
+      "2": "data/3UTR/B_TNR_msk_3UTR_2xAG.out.tsv",
+      "5": "data/3UTR/B_TNR_msk_3UTR_5xAG.out.tsv",
+      "20": "data/3UTR/B_TNR_msk_3UTR_20xAG.out.tsv"
+    }
+  }
+]

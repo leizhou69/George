@@ -61,9 +61,18 @@ def get_connection(db=AG_DB):
                                        hive_partitioning=1)"""
     )
     for d in _DIMS:
-        p = f"{db}/dims/{d}.parquet"
-        if os.path.exists(p):
-            con.execute(f"CREATE VIEW {d} AS SELECT * FROM read_parquet('{p}')")
+        # A dim is either a single file (dims/<d>.parquet) or, for multi-region
+        # backends, a directory of per-region files (dims/<d>/*.parquet) read with
+        # union_by_name so regions with differing catalog columns line up.
+        single = f"{db}/dims/{d}.parquet"
+        multi = f"{db}/dims/{d}"
+        if os.path.exists(single):
+            con.execute(f"CREATE VIEW {d} AS SELECT * FROM read_parquet('{single}')")
+        elif os.path.isdir(multi):
+            con.execute(
+                f"CREATE VIEW {d} AS SELECT * FROM "
+                f"read_parquet('{multi}/*.parquet', union_by_name=1)"
+            )
     return con
 
 
@@ -142,11 +151,13 @@ def schema_doc(db=AG_DB):
 SCHEMA_DOC = textwrap.dedent(
     """\
     == AlphaGenome backend (query with the `query_ag` tool) ==
-    A DuckDB/Parquet star schema of AlphaGenome expansion predictions for 5'UTR
-    GCN tandem repeats. Query it with SQL via `query_ag(sql, to_file=None)`;
-    never read the raw TSVs. The default result cap is 1000 rows — the cap is on
-    ROWS RETURNED TO YOU, not the computation, so aggregate freely (DuckDB scans
-    all ~309M rows). For large per-row derived outputs pass `to_file=`.
+    A DuckDB/Parquet star schema of AlphaGenome expansion predictions for tandem
+    repeats across one or more gene regions (e.g. 5UTR GCN, CDS TNR). Query it
+    with SQL via `query_ag(sql, to_file=None)`; never read the raw TSVs. Filter
+    by `region` (see the regions table) when you want a single region; the
+    partition column makes it cheap. The default result cap is 1000 rows — the
+    cap is on ROWS RETURNED TO YOU, not the computation, so aggregate freely
+    (DuckDB scans all rows). For large per-row derived outputs pass `to_file=`.
 
     Tables (views):
       ag_scores(variant_id, region, expansion, output_type, scorer_id, track_id,
@@ -155,8 +166,13 @@ SCHEMA_DOC = textwrap.dedent(
           output_type are partitions (fast to filter). gene_id/track_id are NULL
           for non-genic / non-tracked outputs. expansion ∈ {2,5,20}.
       variants(variant_id, locus_id, region, canonical_motif, motif_id,
-               host_gene_name, host_gene_id, gencode_gene_region, is_pathogenic,
-               disease, + all B-catalog attributes)
+               motif_len, motif_class, host_gene_name, host_gene_id,
+               gencode_gene_region, + all masked-catalog attributes)
+          motif_len = repeat-unit length; motif_class = trinucleotide /
+          tetranucleotide / … derived per variant (don't assume a region is one
+          class). The catalogs are masked: the ag_db carries NO pathogenic /
+          disease labels. Catalog attributes may vary by region (NULL where a
+          region's catalog lacks a column).
       tracks(track_id, track_key, track_name, track_strand, assay_title,
              ontology_curie, biosample_name, biosample_type, biosample_life_stage,
              data_source, endedness, genetically_modified, transcription_factor,
@@ -165,22 +181,21 @@ SCHEMA_DOC = textwrap.dedent(
               aggregation_type)
       genes(gene_id, gene_ensembl_id, gene_name, gene_type, gene_strand)
       output_types(output_type, output_type_ord)
-      regions(region, motif_class, notes)
+      regions(region, repeat_type, notes)   -- repeat_type is a free-form label
 
     Example queries:
-      -- pathogenic vs background mean RNA_SEQ effect per expansion
-      SELECT s.expansion,
-             v.is_pathogenic,
+      -- mean RNA_SEQ effect per region × expansion
+      SELECT v.region, s.expansion,
              avg(s.raw_score) AS mean_raw,
              count(*)         AS n
       FROM ag_scores s JOIN variants v USING (variant_id)
       WHERE s.output_type='RNA_SEQ'
       GROUP BY 1,2 ORDER BY 1,2;
 
-      -- top loci by max |raw_score| at 20x for CAGE
+      -- top CDS loci by max |raw_score| at 20x for CAGE
       SELECT v.locus_id, v.host_gene_name, max(abs(s.raw_score)) AS max_abs
       FROM ag_scores s JOIN variants v USING (variant_id)
-      WHERE s.expansion=20 AND s.output_type='CAGE'
+      WHERE v.region='CDS' AND s.expansion=20 AND s.output_type='CAGE'
       GROUP BY 1,2 ORDER BY max_abs DESC LIMIT 20;
 
       -- materialize a full per-variant score table (don't pull into context)
