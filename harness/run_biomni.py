@@ -31,6 +31,18 @@ os.environ.setdefault("AG_DB", str(_REPO_ROOT / "data" / "ag_db"))
 sys.path.insert(0, str(_REPO_ROOT / "db"))
 from query_ag import query_ag, schema_doc as ag_schema_doc
 
+# Append-only run log for every biomni experiment (start + outcome), kept at the
+# repo root so a chronological record of what was run travels with the project.
+BIOMNI_LOG = _REPO_ROOT / "biomni_log.md"
+
+
+def biomni_log(msg: str) -> None:
+    """Append a timestamped line to biomni_log.md (and echo it)."""
+    line = f"{datetime.now():%Y-%m-%d %H:%M:%S}  {msg}"
+    print(line)
+    with open(BIOMNI_LOG, "a", encoding="utf-8") as fh:
+        fh.write(line + "\n")
+
 
 def _model_ignores_temperature(model_name: str) -> bool:
     """Whether sweeping temperature is meaningless for this model.
@@ -99,7 +111,11 @@ TIMEOUT_ID = "200m"  # Short ID for output filename
 DATA_FILES = {
     "Pathogenic_repeats": "data/5UTR/B_5UTR_Pathogenic_GCN.txt",
     "All_5UTR_GCN_catalog": "data/5UTR/B_Cat_5UTR_GCNs_masked.tsv",
-    "AG_variants_dim": "data/ag_db/dims/variants.parquet",
+    # The variants dim is now per-region (multi-region backend): the combined
+    # dims/variants.parquet no longer exists. This 5'UTR task browses the 5'UTR
+    # file directly; the full cross-region `variants` view is still reachable via
+    # query_ag. (All 6,650 GCN loci from the catalog above are covered here.)
+    "AG_variants_dim": "data/ag_db/dims/variants/5UTR.parquet",
     "AG_tracks_dim": "data/ag_db/dims/tracks.parquet",
 }
 
@@ -132,7 +148,8 @@ def run_single_experiment(llm_name, llm_id, temperature, query_path, prompt, out
     print(f"Temperature: {temperature}")
     print(f"Timeout: {TIMEOUT_SECONDS}s")
     print(f"{'='*80}\n")
-    
+
+    prefix = f"{QUERY_ID}_{llm_id}_Tmp{temperature}_{TIMEOUT_ID}"  # fallback for early errors
     try:
         # Create output directory first
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -140,7 +157,12 @@ def run_single_experiment(llm_name, llm_id, temperature, query_path, prompt, out
         
         log_dir = Path(output_dir) / prefix
         log_dir.mkdir(parents=True, exist_ok=True)
-        
+
+        biomni_log(
+            f"[start] {prefix}  model={llm_name}  temp={temperature}  "
+            f"timeout={TIMEOUT_SECONDS}s  query={QUERY_ID}  out={log_dir}"
+        )
+
         # Change to output directory so all agent-generated files go there
         original_cwd = os.getcwd()
         os.chdir(log_dir)
@@ -217,17 +239,32 @@ def run_single_experiment(llm_name, llm_id, temperature, query_path, prompt, out
             print(f"Saved {len(saved_images)} image(s) to {log_dir / image_dir}")
             print(f"Wrote markdown to {log_dir / md_path}")
             print(f"\n✓ Experiment {prefix} completed successfully")
-            
+
+            # Note which expected deliverables the agent actually produced.
+            deliverables = [
+                "pathogenic_repeat_analysis.ipynb",
+                "Candidate_Identification.ipynb",
+                "Top_Candidate_Pathogenic_repeats.csv",
+            ]
+            present = [d for d in deliverables if Path(d).exists()]
+            biomni_log(
+                f"[done ] {prefix}  status=success  "
+                f"log_entries={len(agent.log)}  images={len(saved_images)}  "
+                f"deliverables={len(present)}/{len(deliverables)} "
+                f"[{', '.join(present) or 'none'}]"
+            )
+
         finally:
             # Always restore original directory
             os.chdir(original_cwd)
-        
+
         return True
-        
+
     except Exception as e:
         print(f"\n✗ Experiment failed with error: {e}")
         import traceback
         traceback.print_exc()
+        biomni_log(f"[done ] {prefix}  status=FAILED  error={type(e).__name__}: {e}")
         
         # Try to restore directory even on error
         try:
