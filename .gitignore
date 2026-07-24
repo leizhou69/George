@@ -1,7 +1,7 @@
 # Data & run outputs — never tracked (see upgrade.md constraints)
 data/
 output/
-db/ag_db/
+data/ag_db/   # AG DuckDB/Parquet backend (lives under data/, per AG_DB_DESIGN.md §8.1)
 # symlink to the 15G local Biomni data-lake cache
 biomni_data_cache
 

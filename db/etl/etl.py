@@ -226,6 +226,17 @@ def build_dims():
     regions = load_regions()
     os.makedirs(DIMS, exist_ok=True)
     os.makedirs(f"{DIMS}/variants", exist_ok=True)
+    # A prior single-region build may have left a combined dims/variants.parquet.
+    # query_ag.get_connection() prefers the single-file form (dims/<d>.parquet)
+    # over the per-region directory (dims/<d>/*.parquet), so a stale
+    # variants.parquet SHADOWS the real per-region files and hides every region
+    # but the old one. In a multi-region build variants is always the per-region
+    # directory form, so remove the stale single file if present.
+    stale_variants = f"{DIMS}/variants.parquet"
+    if os.path.exists(stale_variants):
+        os.remove(stale_variants)
+        log(f"[dims] removed stale single-file {stale_variants} "
+            f"(superseded by variants/<region>.parquet)")
     con = connect()
     ag_all = read_ag_multi([r["ag"]["2"] for r in regions])
     log(f"[dims] building shared dims from 2x files of regions: "

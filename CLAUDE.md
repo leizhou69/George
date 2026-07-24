@@ -97,4 +97,6 @@ gemini/grok keys. Source auto-detected from the model-name prefix in
 - API keys: `.env` only — never hardcode or commit (`.gitignore` covers `.env`).
 - Biomni changes go in `../biomni-fork` and get documented in its `PATCHES.md`;
   keep divergence from upstream minimal.
-- Don't commit `data/`, `output/`, `biomni_data_cache`, or `db/ag_db/`.
+- Don't commit `data/`, `output/`, `biomni_data_cache`, or `data/ag_db/` (the AG
+  backend lives under `data/`, per `db/AG_DB_DESIGN.md` §8.1; `db/` holds only the
+  ETL/query code and design docs).
