@@ -4,8 +4,16 @@ BACKGROUND: There are over 6,000 GCN repeats on the 5' UTRs (5UTR) of human gene
  
 GOAL: Understand what the unique characteristics of pathogenic repeats are.
 
+SCOPE (IMPORTANT): This analysis is restricted to 5'UTR **GCN** repeats — the ~6,650
+loci in B_Cat_5UTR_GCNs_masked.tsv plus the 7 known pathogenic loci. The AlphaGenome
+backend reached via `query_ag` now ALSO contains non-GCN 5'UTR repeats and other gene
+regions (CDS, 3'UTR); those are OUT OF SCOPE. Define your candidate universe from the
+GCN catalog above — equivalently, when reading the `variants` view, always filter
+`region = '5UTR' AND canonical_motif IN ('CCG','AGC','CGG','CTG')`. Do NOT include
+non-GCN loci (e.g. AAG / AGG / ATC canonical motifs) in any candidate ranking.
 
-DATA: 
+
+DATA:
 	(1) The B_5UTR_Pathogenic_GCNs.txt file has the 7 pathogenic repeats, their unique id are in the "LocusId" column.
     
     (2) The B_Cat_5UTR_GCNs_masked.tsv file that has all the other GCN repeats in 5UTR region. This file has other fields, including:

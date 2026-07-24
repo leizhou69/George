@@ -28,7 +28,16 @@ from biomni.llm import _anthropic_rejects_sampling_params
 # "data/ag_db" would otherwise not resolve. query_ag reads $AG_DB at import time.
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 os.environ.setdefault("AG_DB", str(_REPO_ROOT / "data" / "ag_db"))
-sys.path.insert(0, str(_REPO_ROOT / "db"))
+_DB_DIR = str(_REPO_ROOT / "db")
+sys.path.insert(0, _DB_DIR)
+# Also expose db/ on PYTHONPATH so agent-spawned SUBPROCESSES (run_bash_script)
+# can `import query_ag` — child processes do NOT inherit the parent's sys.path,
+# only its environment. (A prior run hit "No module named 'query_ag'" when the
+# agent imported it in a generated script instead of calling the registered tool.)
+os.environ["PYTHONPATH"] = (
+    _DB_DIR + os.pathsep + os.environ["PYTHONPATH"]
+    if os.environ.get("PYTHONPATH") else _DB_DIR
+)
 from query_ag import query_ag, schema_doc as ag_schema_doc
 
 # Append-only run log for every biomni experiment (start + outcome), kept at the
