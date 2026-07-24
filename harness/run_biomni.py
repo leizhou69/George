@@ -87,9 +87,9 @@ MODEL_NAMES = {
     "o4.8": "claude-opus-4-8",
 }
 
-# Query configuration
-QUERY_FILE = "queries/query_05_b.txt"  # Path to query text file (project-root-relative)
-QUERY_ID = "q05b"  # Short ID for output filename
+# Query/data configuration is per-region — see REGION_CONFIGS below (select with
+# --region; default 5UTR). The active QUERY_FILE / QUERY_ID / DATA_FILES globals
+# are resolved from it at module load and may be overridden in main().
 
 # LLM configurations (model_name: short_id)
 # Used as fallback when no models are specified on the command line
@@ -112,21 +112,41 @@ TEMPERATURES = [0.5,0.7, 0.9]
 TIMEOUT_SECONDS = 12000
 TIMEOUT_ID = "200m"  # Short ID for output filename
 
-# Data files to register with agent.
-# The three ~30 GB AG TSVs are NO LONGER registered — the ~311M AlphaGenome
-# rows now live in the DuckDB/Parquet backend (data/ag_db/) and are reached via
-# the `query_ag` tool (registered per-experiment; see run_single_experiment).
-# Small files stay registered as-is; the dim Parquets are small + browsable.
-DATA_FILES = {
-    "Pathogenic_repeats": "data/5UTR/B_5UTR_Pathogenic_GCN.txt",
-    "All_5UTR_GCN_catalog": "data/5UTR/B_Cat_5UTR_GCNs_masked.tsv",
-    # The variants dim is now per-region (multi-region backend): the combined
-    # dims/variants.parquet no longer exists. This 5'UTR task browses the 5'UTR
-    # file directly; the full cross-region `variants` view is still reachable via
-    # query_ag. (All 6,650 GCN loci from the catalog above are covered here.)
-    "AG_variants_dim": "data/ag_db/dims/variants/5UTR.parquet",
-    "AG_tracks_dim": "data/ag_db/dims/tracks.parquet",
+# Per-region configuration. Each region names its query file, output id, and the
+# small files registered with the agent: the pathogenic-locus list, the catalog,
+# the per-region variants dim, and the shared tracks dim. The three big AG TSVs
+# are NOT registered — the AlphaGenome rows live in the DuckDB/Parquet backend
+# (data/ag_db/) and are reached via the `query_ag` tool. The dim Parquets are
+# small + browsable. Select a region with --region (default 5UTR).
+REGION_CONFIGS = {
+    "5UTR": {
+        "query_file": "queries/query_05_b.txt",
+        "query_id": "q05b",
+        "data_files": {
+            "Pathogenic_repeats": "data/5UTR/B_5UTR_Pathogenic_GCN.txt",
+            "All_5UTR_GCN_catalog": "data/5UTR/B_Cat_5UTR_GCNs_masked.tsv",
+            "AG_variants_dim": "data/ag_db/dims/variants/5UTR.parquet",
+            "AG_tracks_dim": "data/ag_db/dims/tracks.parquet",
+        },
+    },
+    "CDS": {
+        "query_file": "queries/query_05_cds.txt",
+        "query_id": "q05cds",
+        "data_files": {
+            "Pathogenic_repeats": "data/CDS/B_CDS_Pathogenic_TNR_Nokey.txt",
+            "All_CDS_TNR_catalog": "data/CDS/B_Cat_CDS_msk_TNR.tsv",
+            "AG_variants_dim": "data/ag_db/dims/variants/CDS.parquet",
+            "AG_tracks_dim": "data/ag_db/dims/tracks.parquet",
+        },
+    },
 }
+DEFAULT_REGION = "5UTR"
+
+# Active config (module globals used by run_single_experiment / main); a --region
+# override rebinds these at the top of main().
+QUERY_FILE = REGION_CONFIGS[DEFAULT_REGION]["query_file"]
+QUERY_ID = REGION_CONFIGS[DEFAULT_REGION]["query_id"]
+DATA_FILES = REGION_CONFIGS[DEFAULT_REGION]["data_files"]
 
 # ============================================================================
 # END CONFIGURATION SECTION
@@ -320,8 +340,24 @@ Examples:
         metavar='T',
         help='Temperatures to run (e.g., --temperatures 0.9). Defaults to all temperatures in TEMPERATURES.'
     )
+    parser.add_argument(
+        '--region',
+        choices=sorted(REGION_CONFIGS),
+        default=DEFAULT_REGION,
+        help=f'Which region task to run (default: {DEFAULT_REGION}). Selects the '
+             f'query file + registered data files from REGION_CONFIGS.'
+    )
 
     args = parser.parse_args()
+
+    # Rebind the active region config (query file, output id, data files) from
+    # --region so run_single_experiment and the rest of main() see them.
+    global QUERY_FILE, QUERY_ID, DATA_FILES
+    cfg = REGION_CONFIGS[args.region]
+    QUERY_FILE = cfg["query_file"]
+    QUERY_ID = cfg["query_id"]
+    DATA_FILES = cfg["data_files"]
+    print(f"Region: {args.region}  ({QUERY_FILE}, id={QUERY_ID})")
 
     # Determine which models to run
     if args.models:
