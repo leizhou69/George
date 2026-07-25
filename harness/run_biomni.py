@@ -85,6 +85,7 @@ MODEL_NAMES = {
     "grk4": "grok-4",
     "o4.6": "claude-opus-4-6",
     "o4.8": "claude-opus-4-8",
+    "o5": "claude-opus-5",
 }
 
 # Query/data configuration is per-region — see REGION_CONFIGS below (select with

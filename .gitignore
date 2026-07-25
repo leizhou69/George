@@ -24,5 +24,10 @@ __pycache__/
 # SLURM job logs
 slurm-*.out
 
+# Claude Code: track shared skills, ignore local/runtime state
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/worktrees/
+
 # OS
 .DS_Store

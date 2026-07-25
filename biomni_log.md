@@ -51,3 +51,44 @@ task-scoping artifact of the DB now carrying the full TNR set, not a data proble
 **Action for GCN-only runs:** constrain the candidate universe to GCN motifs, either by
 keeping it anchored to the registered GCN catalog or by filtering
 `WHERE canonical_motif IN ('CCG','AGC','CGG','CTG')` on the 5UTR variants.
+2026-07-24 19:59:39  [start] q05cds_s5_Tmp0.5_200m_20260724-195939  model=claude-sonnet-5  temp=0.5  timeout=12000s  query=q05cds  out=output/July_24_2026/q05cds_s5_Tmp0.5_200m_20260724-195939
+2026-07-24 20:22:02  [done ] q05cds_s5_Tmp0.5_200m_20260724-195939  status=success  log_entries=185  images=1  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+
+---
+
+## 2026-07-24 — CDS pathogenic-repeat run (s5), standalone baseline
+
+First CDS task run (query_05_cds.txt) on the multi-region ag_db. No prior CDS run
+to compare against, so this is a baseline soundness check.
+
+- Run: `output/July_24_2026/q05cds_s5_Tmp0.5_200m_20260724-195939` (SLURM 37985680,
+  COMPLETED 22m46s, status=success, 3/3 deliverables). MaxRSS 3.0 GB.
+- Backend: queried the CDS partitions via `query_ag` and materialized several
+  per-variant parquets (per_variant_summary, per_variant_signed, repress_20x, …)
+  + ROC plots — CDS partitions served correctly end-to-end.
+- Scope OK: top candidates span multiple TNR motif classes (CAG/AGC, CCG, CTG, GAG,
+  TGG), i.e. the run correctly did NOT restrict to GCN (as intended for CDS).
+- Result: 50 candidates, scored by CompositeScore = 20x epigenetic repression +
+  Is_TranscriptionFactor + repeat features. Strongly enriched for developmental
+  transcription factors (E2F4, MEOX2, HOXA13, DLX6, DACH1, ASCL1, SP8, POU4F2,
+  ZIC5, FOXL2, MEF2A, …) — biologically consistent with known coding-repeat
+  disorders (HOX/FOX/ZIC/RUNX/SOX polyQ & polyA genes).
+- Known-pathogenic recovery: 3 of the 28 known pathogenic CDS genes (AR, FOXL2,
+  HOXA13) appear in the top-50 — positive signal that the score ranks true
+  coding-repeat-disease TFs highly (candidate list is not strictly novel-only).
+
+**CONCLUSION:** the CDS run looks sound — the ag_db CDS partitions and the
+`--region CDS` harness path work end-to-end, scoping is correct (all TNR classes),
+and the candidate signature is biologically plausible with partial recovery of
+known pathogenic loci. Cross-model CDS runs (Opus 4.8 + Opus 5, SLURM 37987506)
+launched for comparison; summary to follow.
+
+### Resource right-sizing (measured; feeds the biomni-slurm skill)
+The 5'UTR s5 run (48 CPU / 420 GB) used **1.2 GB peak RAM** and **13.7 min CPU over
+3.6 h** (0.3% mem, 0.13% CPU) — these agent runs are API-latency-bound, not
+compute-bound (local work = DuckDB 4-thread queries + light pandas; model runs on
+the provider side). The CDS s5 run peaked at 3.0 GB. New runs use **8 CPU / 64 GB**
+(ratio-clean at HPG's 8 GB/core, ~20-50x headroom); the Opus CDS job scheduled
+**instantly** at that size vs the old 48/420 sitting in PENDING (Resources). See
+`.claude/skills/biomni-slurm/SKILL.md`.
+2026-07-24 20:30:20  [start] q05cds_o4.8_Tmp0.5_200m_20260724-203020  model=claude-opus-4-8  temp=0.5  timeout=12000s  query=q05cds  out=output/July_24_2026/q05cds_o4.8_Tmp0.5_200m_20260724-203020
