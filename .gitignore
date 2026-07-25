@@ -15,6 +15,11 @@ db/etl/sample/
 # Secrets
 .env
 
+# Held-out evaluation keys — known pathogenic repeats withheld from the agent.
+# NEVER commit/push these, and never register them with the harness (the agent
+# must not see them; evaluation of recovery happens outside the agent run).
+.keys/
+
 # Python
 __pycache__/
 *.py[cod]

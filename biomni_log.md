@@ -92,3 +92,54 @@ the provider side). The CDS s5 run peaked at 3.0 GB. New runs use **8 CPU / 64 G
 **instantly** at that size vs the old 48/420 sitting in PENDING (Resources). See
 `.claude/skills/biomni-slurm/SKILL.md`.
 2026-07-24 20:30:20  [start] q05cds_o4.8_Tmp0.5_200m_20260724-203020  model=claude-opus-4-8  temp=0.5  timeout=12000s  query=q05cds  out=output/July_24_2026/q05cds_o4.8_Tmp0.5_200m_20260724-203020
+2026-07-24 20:36:24  [done ] q05cds_o4.8_Tmp0.5_200m_20260724-203020  status=success  log_entries=66  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-07-24 20:36:24  [start] q05cds_o5_Tmp0.5_200m_20260724-203624  model=claude-opus-5  temp=0.5  timeout=12000s  query=q05cds  out=output/July_24_2026/q05cds_o5_Tmp0.5_200m_20260724-203624
+2026-07-24 21:18:45  [start] q05b_o5_Tmp0.5_200m_20260724-211845  model=claude-opus-5  temp=0.5  timeout=12000s  query=q05b  out=output/July_24_2026/q05b_o5_Tmp0.5_200m_20260724-211845
+2026-07-24 21:21:12  [start] q05b_o5_Tmp0.5_200m_20260724-212112  model=claude-opus-5  temp=0.5  timeout=12000s  query=q05b  out=output/July_24_2026/q05b_o5_Tmp0.5_200m_20260724-212112
+2026-07-24 21:36:55  [done ] q05b_o5_Tmp0.5_200m_20260724-212112  status=success  log_entries=80  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-07-24 21:36:55  [start] q05b_o4.8_Tmp0.5_200m_20260724-213655  model=claude-opus-4-8  temp=0.5  timeout=12000s  query=q05b  out=output/July_24_2026/q05b_o4.8_Tmp0.5_200m_20260724-213655
+2026-07-24 21:43:29  [done ] q05b_o4.8_Tmp0.5_200m_20260724-213655  status=success  log_entries=60  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+
+---
+
+## 2026-07-24 — 5'UTR cross-model comparison (o5 / o4.8 / s5)
+
+Three 5'UTR GCN runs on the multi-region ag_db: o5 (`...q05b_o5_...212112`), o4.8
+(`...q05b_o4.8_...213655`), s5 (existing `...q05b_s5_...154415`). Compared with the
+compare-biomni-output skill (rank-weighted consensus of top-20).
+
+- **Withheld-key recovery (aggregate; identities in gitignored `.keys/5utr_eval_report.md`):**
+  s5 **2/2**, o4.8 **1/2**, o5 **1/2**; **consensus 2/2**. (Note: for 5'UTR s5 was best,
+  the inverse of the CDS run where o5 led — model performance is task-dependent.)
+- **Overlap:** low agreement (top-50 Jaccard 0.06–0.16); 4 genes in all three top-50.
+- **Consensus top:** NCOR2, MAB21L1, RHOT1, TMEM185A, AFF2, HLA-F, STK39, PRKG1, BCLAF3…
+- **Hypothesis/mechanism divergence:** s5 → signal is intrinsic **repeat instability**
+  (AlphaGenome rejected, 0 AG features); o4.8 → **AG CONTACT_MAPS 3D dose-response**;
+  o5 → **conjunction** (instability gate × residualized AG silencing signature). s5 and o5
+  agree HPRC instability is the single strongest discriminator. Full writeup:
+  `analysis/comparisons_5utr/5UTR_model_hypothesis_comparison.md`.
+- Shareable outputs (predictions only): `analysis/comparisons_5utr/{consensus_top_candidates.csv,
+  overlap_shared_counts.csv, comparison_report.md}`.
+
+CORRECTION to the earlier CDS s5 note (2026-07-24 CDS baseline section): the true
+evaluation metric is recovery of the **withheld** keys in `.keys/`, NOT the 28 given
+pathogenic loci the agent was shown. (CDS consensus recovery is finalized when the CDS o5
+run completes.)
+
+
+---
+
+## 2026-07-24 — CDS cross-model comparison (o5 / o4.8 / s5)
+
+Three CDS runs on the multi-region ag_db (all-TNR scope): s5 (`...q05cds_s5_...195939`),
+o4.8 (`...q05cds_o4.8_...203020`), o5 (`...q05cds_o5_...203624`). NOTE: the o5 CDS SLURM
+process hung after its deliverables were written (~20:47) — same thread-timeout hang as the
+earlier s5 5'UTR run — and was cancelled (37987506); its candidate CSV is final/stable.
+
+- **Withheld-key recovery (aggregate; identities in gitignored `.keys/cds_eval_report.md`):**
+  s5 0/3, o4.8 1/3, o5 2/3; consensus 2/3.
+  (o5 led on CDS — inverse of the 5'UTR run where s5 led; model performance is task-dependent.)
+- **Overlap:** top-50 Jaccard ~0.22-0.28; 13 genes shared across all three.
+- **Consensus top:** MAML3, POU4F2, BMP2K, ZIC5, DENND4B, E2F4, TNRC18, ASCL1 ...
+- Hypothesis/mechanism writeup: `analysis/comparisons_cds/CDS_model_hypothesis_comparison.md`.
+- Shareable outputs (predictions only): `analysis/comparisons_cds/{consensus_top_candidates.csv,overlap_shared_counts.csv,comparison_report.md}`.
