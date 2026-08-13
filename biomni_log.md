@@ -143,3 +143,53 @@ earlier s5 5'UTR run — and was cancelled (37987506); its candidate CSV is fina
 - **Consensus top:** MAML3, POU4F2, BMP2K, ZIC5, DENND4B, E2F4, TNRC18, ASCL1 ...
 - Hypothesis/mechanism writeup: `analysis/comparisons_cds/CDS_model_hypothesis_comparison.md`.
 - Shareable outputs (predictions only): `analysis/comparisons_cds/{consensus_top_candidates.csv,overlap_shared_counts.csv,comparison_report.md}`.
+
+
+---
+
+## 2026-08-13 — 3'UTR region assessed and DEFERRED (no runs)
+
+Scoped 3'UTR as the next region (it was the standing "likely next" step). **The backend is
+ready; the task is not.** No runs were launched and no `queries/query_05_3utr.txt` or
+`REGION_CONFIGS` entry was added.
+
+**Backend readiness — fully OK.**
+- `data/3UTR/B_Cat_3UTR_msk_TNR.tsv` = **17,020** TNR loci.
+- ag_db coverage **17,020 / 17,020** catalog loci resolve in the `variants` dim AND carry
+  AG scores; **800,842,343** fact rows under `region=3UTR`. Dim + partitions both present.
+- So `--region 3UTR` would work end-to-end the moment a task exists.
+
+**Blocker — no pathogenic-locus list, and biology can't supply one at useful size.**
+Unlike 5'UTR (7 given positives) and CDS (28), no `B_3UTR_Pathogenic_*.txt` exists anywhere
+in the repo. Checking the known 3'UTR repeat-expansion genes against the catalog:
+
+| Gene | In catalog | Verdict |
+|---|---|---|
+| **DMPK** | `19-45770204-45770264-CAG`, canonical AGC, 20 ref repeats | **genuine** — the DM1 CTG repeat |
+| ATXN8OS / ATXN8 | absent | lncRNA; not annotated as a 3'UTR TNR |
+| JPH3 | absent | repeat sits in alt-spliced exon 2A |
+| NOP56 | absent | SCA36 is an intronic **hexa**nucleotide (GGCCTG) |
+| CNBP | 2 rows present | DM2 is an intronic **tetra**nucleotide (CCTG); the rows present are unrelated ACC/AGG repeats |
+| TCF4 | 4 rows present | Fuchs CTG18.1 is **intron 3**; the rows present are unrelated |
+
+Net positive set = **n = 1**. The templated task ("what distinguishes pathogenic repeats",
+case/control statistics, effect sizes, plus held-out-key recovery as the eval metric)
+does not function at n=1 — no contrast, no effect sizes, and nothing left to withhold as
+eval keys. Consistent with this, there is no `.keys/3utr_keys`.
+
+**Decision (user, 2026-08-13): skip 3'UTR for now.** Do not re-propose the region without
+a supplied positive list. Options preserved for if it is revisited:
+1. User supplies a 3'UTR pathogenic list (+ optional withheld keys) — then onboard normally
+   via the `add-biomni-region` skill.
+2. **Cross-region transfer:** train the pathogenic signature on the 35 labeled 5'UTR+CDS
+   positives (all already in the ag_db) and score the 17,020 3'UTR loci as the discovery
+   set. Statistically the strongest option; needs a new query template, not a copy of
+   `query_05_cds.txt`.
+3. **DMPK-anchored one-class ranking:** rank 3'UTR loci by similarity of AG expansion
+   signature to DMPK. Closest to the existing template, but yields no case/control
+   statistics and no held-out-key evaluation.
+
+**Convention confirmed along the way:** pathogenic loci live **inside** their region
+catalog — CDS 28/28 and 5'UTR 7/7 of the pathogenic LocusIds are also catalog rows. The
+pathogenic file *labels a subset*; it is not a disjoint add-on. Relevant to how any future
+region's positive list should be built.
