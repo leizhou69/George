@@ -24,6 +24,6 @@ conda activate biomni_e1
 mkdir -p output/July_24_2026
 
 echo "Running 5'UTR task with Opus 5 + Opus 4.8 (each once at Tmp0.5)..."
-python harness/run_biomni.py o5 o4.8 --region 5UTR --temperatures 0.5 --output-dir output/July_24_2026 2>&1 | tee output/July_24_2026/q05b_o5_o48_$(date +%Y%m%d-%H%M%S).log
+python harness/run_george.py o5 o4.8 --region 5UTR --temperatures 0.5 --output-dir output/July_24_2026 2>&1 | tee output/July_24_2026/q05b_o5_o48_$(date +%Y%m%d-%H%M%S).log
 
 echo "5'UTR Opus run completed!"

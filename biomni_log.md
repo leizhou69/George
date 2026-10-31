@@ -1,6 +1,6 @@
 # biomni_log
 
-Append-only run log for Biomni harness (`harness/run_biomni.py`) experiments.
+Append-only run log for Biomni harness (`harness/run_george.py`) experiments.
 Each run appends a `[start]` line and a `[done ]` line (status + deliverables).
 Written automatically by the harness; do not hand-edit above this note.
 
@@ -193,3 +193,11 @@ a supplied positive list. Options preserved for if it is revisited:
 catalog — CDS 28/28 and 5'UTR 7/7 of the pathogenic LocusIds are also catalog rows. The
 pathogenic file *labels a subset*; it is not a disjoint add-on. Relevant to how any future
 region's positive list should be built.
+2026-10-31 18:27:06  [start] q05cds_o5.5_Tmp0.5_200m_20261031-182706  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05cds  out=output/Oct_31_2026/q05cds_o5.5_Tmp0.5_200m_20261031-182706
+2026-10-31 18:27:06  [start] q05b_o5.5_Tmp0.5_200m_20261031-182706  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05b  out=output/Oct_31_2026/q05b_o5.5_Tmp0.5_200m_20261031-182706
+2026-10-31 18:27:08  [done ] q05cds_o5.5_Tmp0.5_200m_20261031-182706  status=FAILED  error=UnboundLocalError: cannot access local variable 'api' where it is not associated with a value
+2026-10-31 18:27:08  [done ] q05b_o5.5_Tmp0.5_200m_20261031-182706  status=FAILED  error=UnboundLocalError: cannot access local variable 'api' where it is not associated with a value
+2026-10-31 18:34:10  [start] q05b_o5.5_Tmp0.5_200m_20261031-183410  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05b  out=output/Oct_31_2026/q05b_o5.5_Tmp0.5_200m_20261031-183410
+2026-10-31 18:34:10  [start] q05cds_o5.5_Tmp0.5_200m_20261031-183410  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05cds  out=output/Oct_31_2026/q05cds_o5.5_Tmp0.5_200m_20261031-183410
+2026-10-31 18:35:07  [done ] q05b_o5.5_Tmp0.5_200m_20261031-183410  status=FAILED  error=PermissionDeniedError: Error code: 403 - {'type': 'error', 'error': {'type': 'permission_error', 'message': 'model: "claude-opus-5-5" is suspended for this organization until 2026-10-31T23:35:06Z', 'details': {'error_code': 'model_access_suspended'}}, 'request_id': 'req_011Cgb7V736VcQNLEsLJzs6a'}
+2026-10-31 18:35:08  [done ] q05cds_o5.5_Tmp0.5_200m_20261031-183410  status=FAILED  error=PermissionDeniedError: Error code: 403 - {'type': 'error', 'error': {'type': 'permission_error', 'message': 'model: "claude-opus-5-5" is suspended for this organization until 2026-10-31T23:35:06Z', 'details': {'error_code': 'model_access_suspended'}}, 'request_id': 'req_011Cgb7VCchF8Q3bpgCoDqgC'}

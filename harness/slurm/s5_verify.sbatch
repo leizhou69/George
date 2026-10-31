@@ -22,6 +22,6 @@ conda activate biomni_e1
 mkdir -p output/July_24_2026
 
 echo "Running s5 verification (single run; temperature ignored)..."
-python harness/run_biomni.py s5 --output-dir output/July_24_2026 2>&1 | tee output/July_24_2026/q05_s5_verify_$(date +%Y%m%d-%H%M%S).log
+python harness/run_george.py s5 --output-dir output/July_24_2026 2>&1 | tee output/July_24_2026/q05_s5_verify_$(date +%Y%m%d-%H%M%S).log
 
 echo "s5 verification run completed!"

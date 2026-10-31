@@ -22,6 +22,6 @@ conda activate biomni_e1
 mkdir -p output/July_24_2026
 
 echo "Running s5 CDS task (single run; temperature ignored)..."
-python harness/run_biomni.py s5 --region CDS --output-dir output/July_24_2026 2>&1 | tee output/July_24_2026/q05cds_s5_$(date +%Y%m%d-%H%M%S).log
+python harness/run_george.py s5 --region CDS --output-dir output/July_24_2026 2>&1 | tee output/July_24_2026/q05cds_s5_$(date +%Y%m%d-%H%M%S).log
 
 echo "s5 CDS run completed!"

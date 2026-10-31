@@ -25,6 +25,6 @@ conda activate biomni_e1
 mkdir -p output/July_24_2026
 
 echo "Running CDS task with Opus 4.8 + Opus 5 (each once; temperature ignored)..."
-python harness/run_biomni.py o4.8 o5 --region CDS --output-dir output/July_24_2026 2>&1 | tee output/July_24_2026/q05cds_opus_$(date +%Y%m%d-%H%M%S).log
+python harness/run_george.py o4.8 o5 --region CDS --output-dir output/July_24_2026 2>&1 | tee output/July_24_2026/q05cds_opus_$(date +%Y%m%d-%H%M%S).log
 
 echo "CDS Opus run completed!"

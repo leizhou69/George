@@ -1,0 +1,20 @@
+#!/bin/bash
+#SBATCH --job-name=q05cds_o55
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=leizhou@ufl.edu
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=64gb
+#SBATCH --time=24:00:00
+#SBATCH --qos=zhou-b
+
+# CDS task with Opus 5.5 (rejects temperature -> runs once; --temperatures 0.5
+# pins the Tmp0.5 label to match prior s5/o4.8/o5 comparators).
+cd /blue/zhou/leizhou/Agents/George
+ml conda
+conda activate biomni_e1
+mkdir -p output/Oct_31_2026
+python harness/run_george.py o5.5 --region CDS --temperatures 0.5 --output-dir output/Oct_31_2026 \
+  2>&1 | tee output/Oct_31_2026/q05cds_o55_$(date +%Y%m%d-%H%M%S).log
+echo "CDS Opus 5.5 run completed!"

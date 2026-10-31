@@ -48,7 +48,7 @@ The region's AlphaGenome scores must already be ingested (dims + fact partitions
      deliverables check finds them.
 
 2. **Register in the harness** — add a `REGION_CONFIGS` entry in
-   `harness/run_biomni.py`:
+   `harness/run_george.py`:
    ```python
    "<REGION>": {
        "query_file": "queries/query_05_<region>.txt",
@@ -74,7 +74,7 @@ The region's AlphaGenome scores must already be ingested (dims + fact partitions
 
 4. **Launch** — right-sized SLURM job (see `biomni-slurm` skill: 8 CPU / 64 GB):
    ```bash
-   python harness/run_biomni.py <models> --region <REGION> --output-dir output/<dated>
+   python harness/run_george.py <models> --region <REGION> --output-dir output/<dated>
    ```
    Note temperature handling: Opus 4.7+/Opus 5/Sonnet 5 reject temperature (run
    once); Opus 4.5 and older ACCEPT it, so pass `--temperatures 0.5` to avoid a

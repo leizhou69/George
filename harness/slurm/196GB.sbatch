@@ -17,4 +17,4 @@ ml conda
 conda activate biomni_e1
 
 mkdir -p output
-python harness/run_biomni.py 2>&1 | tee output/run_$(date +%Y%m%d-%H%M%S).log
+python harness/run_george.py 2>&1 | tee output/run_$(date +%Y%m%d-%H%M%S).log

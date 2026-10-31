@@ -24,7 +24,7 @@ expansion predictions plus supplied data. The agent emits
 
 ## Layout
 ```
-harness/run_biomni.py          the batch-experiment harness
+harness/run_george.py          the batch-experiment harness
 harness/slurm/*.sbatch         SLURM submit scripts (submit from repo root)
 db/AG_DB_DESIGN.md, db/etl/    the AG DuckDB/Parquet backend (built Phase 4)
 queries/query_05_b.txt         the active task
@@ -47,26 +47,26 @@ See `environment.md` for install/verification.
 
 ```bash
 conda activate biomni_e1
-python harness/run_biomni.py s5 o4.8              # run named model keys
-python harness/run_biomni.py o4.8 --temperatures 0.7
-python harness/run_biomni.py                       # no args → LLM_CONFIGS defaults
+python harness/run_george.py s5 o4.8              # run named model keys
+python harness/run_george.py o4.8 --temperatures 0.7
+python harness/run_george.py                       # no args → LLM_CONFIGS defaults
 
 sbatch harness/slurm/512GB.sbatch                  # s5 + o4.8 on SLURM
 sbatch harness/slurm/196GB.sbatch                  # LLM_CONFIGS defaults
 ```
 
-`run_biomni.py` loops **models × temperatures**; per combo it `cd`s into a fresh
+`run_george.py` loops **models × temperatures**; per combo it `cd`s into a fresh
 `output/<prefix>/`, builds an `A1` agent (`path=./biomni_data_cache`,
 `timeout_seconds=12000`), registers `DATA_FILES` as absolute paths, runs
 `agent.go(prompt)`, then writes `.log`, `.md`, and `media/*.png`.
 
 ### Model keys (`MODEL_NAMES`)
 `s5`→`claude-sonnet-5`, `o4.8`→`claude-opus-4-8`, `s4.6`→`claude-sonnet-4-6`,
-`o4.6`→`claude-opus-4-6`, `o4.5`→`claude-opus-4-5-20251101`, plus gpt5/gpt5.2/
+`o4.6`→`claude-opus-4-6`, `o5`→`claude-opus-5`, `o5.5`→`claude-opus-5-5`, `o4.5`→`claude-opus-4-5-20251101`, plus gpt5/gpt5.2/
 gemini/grok keys. Source auto-detected from the model-name prefix in
 `biomni/llm.py::get_llm`.
 
-### Config knobs (top of `run_biomni.py`)
+### Config knobs (top of `run_george.py`)
 `QUERY_FILE` (`queries/query_05_b.txt`), `QUERY_ID`, `LLM_CONFIGS`,
 `TEMPERATURES`, `TIMEOUT_SECONDS` (12000), `DATA_FILES` (5 entries under
 `data/5UTR/`).
@@ -79,7 +79,7 @@ gemini/grok keys. Source auto-detected from the model-name prefix in
 2. **`max_tokens`** is 32000 in the fork's Anthropic branch (was 8192). Raise
    further if long deliverables truncate (`stop_reason: max_tokens`); note the
    SDK requires streaming above ~16K, which this path doesn't use yet.
-3. **S3 data-lake 403s (resolved).** `run_biomni.py` passes
+3. **S3 data-lake 403s (resolved).** `run_george.py` passes
    `expected_data_lake_files=<local files>` to `A1()` so it skips all S3
    downloads and uses the local lake (`biomni_data_cache`, 76/76 files).
 4. **Working-directory side effect.** `run_single_experiment` `os.chdir`es into
@@ -88,6 +88,11 @@ gemini/grok keys. Source auto-detected from the model-name prefix in
 5. **`biomni_data_cache` is now a real local dir** (76 lake files), `mv`'d in
    from the old repo — George is fully self-contained with no dependency on
    `Biomni_Rpts_Ds` (which is archived). It stays gitignored.
+6. **Forced `tool_choice` is rejected by Opus 5.5 / Sonnet 5.5 / Fable 5.1** (HTTP
+   400). langchain-anthropic 0.3.21's `with_structured_output` forces it, which
+   broke `A1.add_tool` (tool-schema generation). Handled by the fork's
+   `biomni/llm.py::with_structured_output_compat` (Patch 3 in `PATCHES.md`); use it
+   instead of calling `llm.with_structured_output` directly in the fork.
 
 ## Output layout
 `output/<QUERYID>_<modelkey>_Tmp<temp>_<timeoutid>_<timestamp>/` with

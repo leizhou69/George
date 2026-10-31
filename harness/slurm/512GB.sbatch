@@ -20,6 +20,6 @@ conda activate biomni_e1
 mkdir -p output/July_20_2026
 
 echo "Running s5 and o4.8 (all temps)..."
-python harness/run_biomni.py s5 o4.8 --output-dir output/July_20_2026 2>&1 | tee output/July_20_2026/q05_s5_o4.8_$(date +%Y%m%d-%H%M%S).log
+python harness/run_george.py s5 o4.8 --output-dir output/July_20_2026 2>&1 | tee output/July_20_2026/q05_s5_o4.8_$(date +%Y%m%d-%H%M%S).log
 
 echo "s5 and o4.8 run completed!"

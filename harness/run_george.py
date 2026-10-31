@@ -14,7 +14,7 @@ from itertools import count
 
 # NOTE: `biomni` is an editable install of the patched fork (../biomni-fork) —
 # no sys.path shadowing. Run this harness from the George project root:
-#   python harness/run_biomni.py s5 o4.8
+#   python harness/run_george.py s5 o4.8
 # so the relative paths below (data/, output/, queries/, biomni_data_cache)
 # resolve against the project root.
 
@@ -86,6 +86,7 @@ MODEL_NAMES = {
     "o4.6": "claude-opus-4-6",
     "o4.8": "claude-opus-4-8",
     "o5": "claude-opus-5",
+    "o5.5": "claude-opus-5-5",
 }
 
 # Query/data configuration is per-region — see REGION_CONFIGS below (select with
@@ -318,9 +319,9 @@ Available model keys:
 {chr(10).join(f'  {key:8} -> {value}' for key, value in MODEL_NAMES.items())}
 
 Examples:
-  python run_biomni.py s4.5           # Run with Sonnet 4.5
-  python run_biomni.py s4.5 o4.5      # Run with Sonnet 4.5 and Opus 4.5
-  python run_biomni.py gpt5           # Run with GPT-5
+  python run_george.py s4.5           # Run with Sonnet 4.5
+  python run_george.py s4.5 o4.5      # Run with Sonnet 4.5 and Opus 4.5
+  python run_george.py gpt5           # Run with GPT-5
 """
     )
     parser.add_argument(

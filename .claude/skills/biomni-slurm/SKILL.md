@@ -2,7 +2,7 @@
 name: biomni-slurm
 description: >-
   Launch, right-size, and chain SLURM jobs for the George biomni harness
-  (harness/run_biomni.py) — the 5UTR / CDS / 3UTR pathogenic-repeat agent runs
+  (harness/run_george.py) — the 5UTR / CDS / 3UTR pathogenic-repeat agent runs
   against the AG DuckDB backend (data/ag_db). Use whenever submitting one of
   these runs, choosing --cpus-per-task / --mem, chaining a follow-up job, or
   checking how much CPU/RAM a finished run actually used.
@@ -22,12 +22,12 @@ Always from the George project root (`cd /blue/zhou/leizhou/Agents/George`), env
 `biomni_e1`:
 
 ```bash
-python harness/run_biomni.py s5 --region CDS --output-dir output/<dated_dir>
-python harness/run_biomni.py o4.8 s5 --region 5UTR      # multiple models (sequential)
+python harness/run_george.py s5 --region CDS --output-dir output/<dated_dir>
+python harness/run_george.py o4.8 s5 --region 5UTR      # multiple models (sequential)
 ```
 
 - `--region {5UTR,CDS,...}` selects the query file + registered data files
-  (`REGION_CONFIGS` in run_biomni.py). Default 5UTR.
+  (`REGION_CONFIGS` in run_george.py). Default 5UTR.
 - Model keys live in `MODEL_NAMES` (s5, o4.8, …). **Sonnet 5 and Opus 4.7+ reject
   the temperature param, so they run once** regardless of `--temperatures`.
 - Models in one invocation run **sequentially**, so resource needs do NOT scale
@@ -103,6 +103,6 @@ cd /blue/zhou/leizhou/Agents/George
 ml conda
 conda activate biomni_e1
 mkdir -p output/<dated_dir>
-python harness/run_biomni.py <models> --region <REGION> --output-dir output/<dated_dir> \
+python harness/run_george.py <models> --region <REGION> --output-dir output/<dated_dir> \
   2>&1 | tee output/<dated_dir>/q05<region>_<models>_$(date +%Y%m%d-%H%M%S).log
 ```

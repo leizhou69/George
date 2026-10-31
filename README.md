@@ -9,7 +9,7 @@ See `upgrade.md` for the migration plan and `db/AG_DB_DESIGN.md` for the DB desi
 
 ## Layout
 ```
-harness/    run_biomni.py + slurm/ sbatch scripts   (the batch-experiment harness)
+harness/    run_george.py + slurm/ sbatch scripts   (the batch-experiment harness)
 db/         AG_DB_DESIGN.md, etl/ (DuckDB ETL), query_ag.py (agent query tool)
 queries/    query_05_b.txt (the active scientific task)
 analysis/   active notebooks (pathogenic_repeat_analysis.ipynb, ...)
@@ -25,7 +25,7 @@ archive/    superseded queries/notebooks
 conda activate biomni_e1
 pip install -e ../biomni-fork
 pip install duckdb pyarrow
-python harness/run_biomni.py s5 o4.8
+python harness/run_george.py s5 o4.8
 ```
 See `environment.md` for details.
 
