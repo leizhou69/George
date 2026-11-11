@@ -78,6 +78,7 @@ MODEL_NAMES = {
     "gem2": "gemini-2.0-flash-exp",
     "gem3f": "gemini-3-flash-preview",
     "gem3p": "gemini-3-pro-preview",
+    "gem4c": "gemini-4-carbon",
     "gpt4o": "gpt-4o",
     "gpt5": "gpt-5",
     "gpt5.2": "gpt-5.2",
@@ -87,6 +88,7 @@ MODEL_NAMES = {
     "o4.8": "claude-opus-4-8",
     "o5": "claude-opus-5",
     "o5.5": "claude-opus-5-5",
+    "f5.2": "claude-fable-5-2",
 }
 
 # Query/data configuration is per-region — see REGION_CONFIGS below (select with
@@ -181,6 +183,7 @@ def run_single_experiment(llm_name, llm_id, temperature, query_path, prompt, out
     print(f"{'='*80}\n")
 
     prefix = f"{QUERY_ID}_{llm_id}_Tmp{temperature}_{TIMEOUT_ID}"  # fallback for early errors
+    original_cwd = os.getcwd()
     try:
         # Create output directory first
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -195,7 +198,6 @@ def run_single_experiment(llm_name, llm_id, temperature, query_path, prompt, out
         )
 
         # Change to output directory so all agent-generated files go there
-        original_cwd = os.getcwd()
         os.chdir(log_dir)
         
         try:
@@ -212,8 +214,9 @@ def run_single_experiment(llm_name, llm_id, temperature, query_path, prompt, out
                 for name, path in DATA_FILES.items()
             })
 
-            # Register the AlphaGenome query tool. The agent hits the ~311M-row
-            # DuckDB backend with SQL via query_ag() instead of loading TSVs.
+            # Register the AlphaGenome query tool. The agent hits the multi-region
+            # DuckDB backend (~2.9B fact rows) with SQL via query_ag() instead of
+            # loading TSVs.
             agent.add_tool(query_ag)
 
             # Run query
@@ -246,13 +249,7 @@ def run_single_experiment(llm_name, llm_id, temperature, query_path, prompt, out
                 saved_images.append(image_path)
                 return f"media/{image_path.name}"
             
-            def replace_md_image(match):
-                rel_path = store_data_uri(match.group(2))
-                if rel_path is None:
-                    return "".join(match.groups())
-                return f"{match.group(1)}{rel_path}{match.group(3)}"
-            
-            def replace_html_image(match):
+            def replace_image(match):
                 rel_path = store_data_uri(match.group(2))
                 if rel_path is None:
                     return "".join(match.groups())
@@ -261,8 +258,8 @@ def run_single_experiment(llm_name, llm_id, temperature, query_path, prompt, out
             md_pattern = r'(!\[[^\]]*\]\()(data:image/[^)]+)(\))'
             html_pattern = r'(src=["\'])(data:image/[^"\']+)(["\'])'
             
-            markdown_content = re.sub(md_pattern, replace_md_image, markdown_content, flags=re.IGNORECASE)
-            markdown_content = re.sub(html_pattern, replace_html_image, markdown_content, flags=re.IGNORECASE)
+            markdown_content = re.sub(md_pattern, replace_image, markdown_content, flags=re.IGNORECASE)
+            markdown_content = re.sub(html_pattern, replace_image, markdown_content, flags=re.IGNORECASE)
             
             md_path = Path(f"{prefix}.md")
             md_path.write_text(markdown_content, encoding="utf-8")
@@ -296,13 +293,6 @@ def run_single_experiment(llm_name, llm_id, temperature, query_path, prompt, out
         import traceback
         traceback.print_exc()
         biomni_log(f"[done ] {prefix}  status=FAILED  error={type(e).__name__}: {e}")
-        
-        # Try to restore directory even on error
-        try:
-            os.chdir(original_cwd)
-        except:
-            pass
-        
         return False
 
 
@@ -319,9 +309,9 @@ Available model keys:
 {chr(10).join(f'  {key:8} -> {value}' for key, value in MODEL_NAMES.items())}
 
 Examples:
-  python run_george.py s4.5           # Run with Sonnet 4.5
-  python run_george.py s4.5 o4.5      # Run with Sonnet 4.5 and Opus 4.5
-  python run_george.py gpt5           # Run with GPT-5
+  python harness/run_george.py s5 o4.8                 # Sonnet 5 and Opus 4.8 (5UTR)
+  python harness/run_george.py o5 --region CDS         # Opus 5 on the CDS task
+  python harness/run_george.py o4.5 --temperatures 0.5 # one temperature only
 """
     )
     parser.add_argument(
@@ -455,6 +445,11 @@ Examples:
     print(f"Successful: {successful}")
     print(f"Failed: {failed}")
     print(f"{'='*80}\n")
+
+    # Non-zero exit so SLURM (with `set -o pipefail` in the sbatch) reports the
+    # job as FAILED instead of COMPLETED when an experiment errored out.
+    if failed:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

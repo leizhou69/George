@@ -10,7 +10,7 @@ Checks the built backend, per region declared in db/etl/regions.json:
   6. (opt-in, AG_VALIDATE_RAWCOUNT=1) per (region, expansion) fact row count vs the
      raw AG TSV row count — proves the INNER joins dropped nothing. This scans the
      full ~30-290 GB TSVs, so it is off by default; also spot-checks one
-     pathogenic locus per region (RNA_SEQ raw_score sum) raw-vs-fact.
+     locus per region (first by locus_id; RNA_SEQ raw_score sum) raw-vs-fact.
 
 Run from the George repo root:  python db/etl/validate.py
 Knobs: AG_THREADS, AG_MEM, AG_OUT, AG_REGIONS_MANIFEST, AG_VALIDATE_RAWCOUNT.

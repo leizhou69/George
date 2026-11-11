@@ -15,8 +15,11 @@ Each biomni run writes `Top_Candidate_Pathogenic_repeats.csv` (its ranked
 predictions), a `<prefix>.md` narrative, and `pathogenic_repeat_analysis.ipynb` /
 `Candidate_Identification.ipynb`. This skill turns a set of such runs into (1) a
 model comparison, (2) a pooled consensus, and (3) a recovery score against the
-held-out keys. The canonical reference implementation is
-`analysis/_build_compare_nb.py` (the 5UTR DB-vs-TSV comparison); reuse its logic.
+held-out keys. The reference implementation is `analysis/_compare_models.py`
+(`python analysis/_compare_models.py 5UTR CDS`), which follows the held-out-key
+discipline below. (`analysis/_build_compare_nb.py`, the older 5UTR DB-vs-TSV
+comparison, predates that discipline — it writes key-labelled columns; don't copy
+its output format.)
 
 ## ⚠️ Held-out-key discipline (read first)
 
@@ -51,7 +54,7 @@ protected:
 - Sanity-check each CSV has the expected N rows (e.g. 50) and isn't degenerate —
   a suspiciously fast run (few log entries) can still emit 50 rows; verify.
 
-## Procedure (mirror analysis/_build_compare_nb.py)
+## Procedure (mirror analysis/_compare_models.py)
 
 ```python
 import glob, itertools, pandas as pd

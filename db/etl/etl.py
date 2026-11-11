@@ -77,6 +77,10 @@ PROMOTED = [
     "LocusId", "CanonicalMotif", "GencodeGeneName", "GencodeGeneId",
     "GencodeGeneRegion",
 ]
+# Catalog columns that must never reach the variants dim: they mark the
+# hand-curated disease-catalog loci (given positives AND withheld keys), i.e. a
+# label leak. Dropped from data/ag_db + the catalog TSVs on 2026-11-11.
+LEAKY_CATALOG_COLS = ["Source", "FoundInPerfectRepeatsInReference"]
 # Only AlphaGenome prediction files may populate the fact/dims. Their names end in
 # AG.tsv, AG.out.tsv, or AG.sout.tsv (5'UTR uses .sout.tsv, CDS/3'UTR use .out.tsv,
 # the original 5'UTR used plain .tsv). Anything else in a manifest ag[] slot is
@@ -364,6 +368,7 @@ def _build_variants(con, spec, offset):
     motif_sel = "c.MotifID AS motif_id" if has_motif else \
         "CAST(NULL AS VARCHAR) AS motif_id"
     excl = PROMOTED + (["MotifID"] if has_motif else [])
+    excl += [c for c in LEAKY_CATALOG_COLS if c in cat_cols]
 
     # motif_len / motif_class are derived from the canonical-motif length so the
     # classification is per-variant and future-proof (tetra-, penta-nucleotide …)

@@ -5,7 +5,9 @@ project repo**, with **Biomni as an editable-installed dependency**, and stand u
 the **DuckDB/Parquet AlphaGenome backend** (see `Rpt_Ds/AG_DB_DESIGN.md`) so the
 pipeline can scale to other gene regions.
 
-Status: **plan (no execution yet)** — review before running any step.
+Status: **executed — all 8 phases complete (2026-07-21)**; see `upgrade_log.md`.
+Kept as the historical plan; paths/sizes below describe the pre-migration state
+(e.g. the harness is now `harness/run_george.py`, not `run_biomni.py`).
 
 ---
 

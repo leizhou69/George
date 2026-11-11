@@ -1,6 +1,13 @@
 # AlphaGenome Data Backend — Design & Plan
 
-Status: **proposal (design only, no code yet)** · Author: agent-assisted · Target: DuckDB over partitioned Parquet
+Status: **implemented** (single-region build 2026-07-21; multi-region rebuild 2026-07-23) · Author: agent-assisted · Target: DuckDB over partitioned Parquet
+
+> This is the original design proposal, kept for its rationale. Where it differs
+> from what was built, `db_construction.md` and `ag_db_July2026_summary.md` are
+> authoritative — notably: the DB lives at `data/ag_db/` (not `Rpt_Ds/data/ag_db/`),
+> holds 5UTR + CDS + 3UTR (~2.9B fact rows, ~19 GB), `variants` is one Parquet per
+> region with **no** `is_pathogenic`/`disease` columns, `regions` carries
+> `repeat_type` (not `motif_class`), and adding a region is a full rebuild.
 
 ## 1. Problem
 

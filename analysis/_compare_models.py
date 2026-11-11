@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-"""Cross-model comparison for one region: s5 / o4.8 / o5 / o5.5.
+"""Cross-model comparison for one region, per the `compare-biomni-output` skill.
 
-Adds the Oct-2026 Opus-5.5 runs to the July-2026 three-model comparison, per the
-`compare-biomni-output` skill. For each region it writes:
+Compares the July-2026 runs (s5 / o4.8 / o5) with the Nov-2026 runs (o5.5 / f5.2 /
+gem4c). Models whose run is not on disk yet are skipped and listed in the report.
+For each region it writes:
 
   shareable  -> analysis/comparisons_<region>/   (predictions only, NO key column)
   gitignored -> .keys/<region>_eval_report.md    (which withheld key, which rank)
@@ -37,12 +38,33 @@ REGIONS = {
     ),
 }
 
-# model key -> which dated output dir to search. o5.5 is the new Oct-2026 run.
+# model key -> which dated output dir to search.
 RUN_DIRS = {
-    "s5": "output/July_24_2026",
-    "o4.8": "output/July_24_2026",
-    "o5": "output/July_24_2026",
-    "o5.5": "output/Oct_31_2026",
+    # Re-masked data (Source + FoundInPerfectRepeatsInReference dropped, 2026-11-11).
+    # o5 has no re-masked run, so it is left out rather than mixed in; the earlier
+    # leaky-data comparison is kept in analysis/comparisons_<region>/pre_remask/.
+    "s5": "output/Nov_11_2026_remasked",
+    "o4.8": "output/Nov_11_2026_remasked",
+    "o5.5": "output/Nov_11_2026_remasked",
+    "f5.2": "output/Nov_11_2026_remasked",
+    "gem4c": "output/Nov_11_2026_remasked",
+}
+
+# Standing caveats carried into each region's report (regenerating must not lose them).
+_REMASK = (
+    "All runs here used the re-masked catalogs / ag_db variants dim (`Source` and "
+    "`FoundInPerfectRepeatsInReference` dropped 2026-11-11; see `db/db_construction.md` "
+    "§4.4). Opus 5 has no re-masked run and is excluded. The pre-re-mask comparison "
+    "(runs that could see those columns) is in `pre_remask/`."
+)
+NOTES = {
+    "5UTR": [_REMASK],
+    "CDS": [
+        _REMASK,
+        "Residual leak: the `CNG` canonical motif (also in the `LocusId`) and "
+        "`ReferenceRepeatPurity` ~0.67 still mark 11 disease-catalog CDS loci, so "
+        "CDS recovery is not a fully clean metric.",
+    ],
 }
 
 ID_COLS = ["LocusId", "locus_id", "variant_id", "original_variant_id"]
@@ -73,12 +95,13 @@ def main(region):
     cfg["outdir"].mkdir(parents=True, exist_ok=True)
 
     # ---- resolve each model's candidate CSV -------------------------------
-    runs, paths = {}, {}
+    runs, paths, missing = {}, {}, []
     for model, subdir in RUN_DIRS.items():
         pat = str(REPO / subdir / f"{cfg['qid']}_{model}_Tmp*" / TARGET)
         hits = sorted(glob.glob(pat))
         if not hits:
             print(f"  {model:5s} MISSING  {pat}")
+            missing.append(model)
             continue
         paths[model] = hits[-1]  # newest if a model was run more than once
         runs[model] = load(hits[-1])
@@ -138,11 +161,14 @@ def main(region):
     agg = ", ".join(f"{m} {len(recovery[m])}/{len(key_loci)}" for m in models)
     lines = [
         f"# {region} Cross-Model Comparison ({' / '.join(models)})",
-        f"_Generated {datetime.now():%Y-%m-%d %H:%M}. "
-        f"Adds the Opus-5.5 run to the July-2026 three-model comparison._",
+        f"_Generated {datetime.now():%Y-%m-%d %H:%M}. Runs: "
+        + "; ".join(f"{m} = `{Path(paths[m]).parent.name}`" for m in models) + "._",
+        *([f"_No candidate CSV on disk yet for: {', '.join(missing)}._"] if missing else []),
+        "",
+        *[f"> **Note:** {n}" for n in NOTES.get(region, [])],
         "",
         "## Recovery of withheld evaluation keys (aggregate)",
-        f"Withheld-key recovery (identities in gitignored {cfg['report'].name}): "
+        f"Withheld-key recovery (identities in gitignored .keys/{cfg['report'].name}): "
         f"{agg}; consensus {len(set(cons_keys))}/{len(key_loci)}.",
         "",
         f"## Pairwise top-{TOPN_OVERLAP} overlap (shared candidates)",

@@ -14,7 +14,10 @@
 cd /blue/zhou/leizhou/Agents/George
 ml conda
 conda activate biomni_e1
-mkdir -p output/Oct_31_2026
-python harness/run_george.py o5.5 --region 5UTR --temperatures 0.5 --output-dir output/Oct_31_2026 \
-  2>&1 | tee output/Oct_31_2026/q05b_o55_$(date +%Y%m%d-%H%M%S).log
+# Fail the job (not "COMPLETED") if the harness fails; set after conda activate,
+# and without -u, because conda's activate scripts reference unset vars.
+set -eo pipefail
+mkdir -p output/Nov_11_2026_remasked
+python harness/run_george.py o5.5 --region 5UTR --temperatures 0.5 --output-dir output/Nov_11_2026_remasked \
+  2>&1 | tee output/Nov_11_2026_remasked/q05b_o55_$(date +%Y%m%d-%H%M%S).log
 echo "5UTR Opus 5.5 run completed!"

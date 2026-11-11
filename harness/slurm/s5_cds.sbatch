@@ -4,8 +4,8 @@
 #SBATCH --mail-user=leizhou@ufl.edu
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=48
-#SBATCH --mem=420gb
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=64gb
 #SBATCH --time=24:00:00
 #SBATCH --qos=zhou
 
@@ -18,10 +18,13 @@ cd /blue/zhou/leizhou/Agents/George
 ml conda
 
 conda activate biomni_e1
+# Fail the job (not "COMPLETED") if the harness fails; set after conda activate,
+# and without -u, because conda's activate scripts reference unset vars.
+set -eo pipefail
 
-mkdir -p output/July_24_2026
+mkdir -p output/Nov_11_2026_remasked
 
 echo "Running s5 CDS task (single run; temperature ignored)..."
-python harness/run_george.py s5 --region CDS --output-dir output/July_24_2026 2>&1 | tee output/July_24_2026/q05cds_s5_$(date +%Y%m%d-%H%M%S).log
+python harness/run_george.py s5 --region CDS --output-dir output/Nov_11_2026_remasked 2>&1 | tee output/Nov_11_2026_remasked/q05cds_s5_$(date +%Y%m%d-%H%M%S).log
 
 echo "s5 CDS run completed!"

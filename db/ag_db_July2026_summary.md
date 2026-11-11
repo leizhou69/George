@@ -73,7 +73,8 @@ Built by `db/etl/etl.py` (manifest `db/etl/regions.json`) from ~1.65 TB of sourc
 AG TSVs. The completed run ran preflight → shared dims → 9 facts between 19:19 and
 21:54. Two earlier same-day runs were partial/aborted (the first reached only 5UTR
 facts); the final 19:19 run is a clean full rebuild and is what the DB reflects.
-Source TSVs are retained under `data/{5UTR,CDS,3UTR}/`.
+The source AG TSVs were under `data/{5UTR,CDS,3UTR}/` at build time; they have
+since been removed (only the catalogs remain), so a rebuild needs them restored.
 
 ## Fixed defect (2026-07-24)
 

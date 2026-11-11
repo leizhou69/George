@@ -1,8 +1,9 @@
 # Data & run outputs — never tracked (see upgrade.md constraints)
 data/
 output/
-data/ag_db/   # AG DuckDB/Parquet backend (lives under data/, per AG_DB_DESIGN.md §8.1)
-# symlink to the 15G local Biomni data-lake cache
+# AG DuckDB/Parquet backend (lives under data/, per AG_DB_DESIGN.md §8.1)
+data/ag_db/
+# the 15G local Biomni data-lake cache (a real dir since 2026-07-21)
 biomni_data_cache
 
 # Large / generated artifacts
@@ -36,3 +37,11 @@ slurm-*.out
 
 # OS
 .DS_Store
+
+# Files that label held-out 5'UTR keys (predate the .keys/ discipline).
+# Untracked 2026-11-11; kept on disk for local use only — never re-add.
+analysis/Verifying_keys.txt
+analysis/comparisons/
+analysis/CompareOutput_DBvsTSV.ipynb
+analysis/Evaluate.ipynb
+analysis/Verify.ipynb

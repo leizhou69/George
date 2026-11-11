@@ -25,9 +25,9 @@ anything else in an `ag[]` slot.
 
 | Region | Masked catalog (loci) | AG predictions (2x / 5x / 20x) | AG size each |
 |--------|-----------------------|--------------------------------|--------------|
-| 5UTR   | `data/5UTR/B_Cat_5UTR_msk_TNR.tsv` (10,054) | `data/5UTR/B_5UTR_TNR_{2,5,20}xAG.sout.tsv` | ~46 GB |
-| CDS    | `data/CDS/B_Cat_CDS_msk_TNR.tsv` (34,892) | `data/CDS/B_TNR_msk_CDS_{2,5,20}xAG.out.tsv` | 188 / 207 / 293 GB |
-| 3UTR   | `data/3UTR/B_Cat_3UTR_msk_TNR.tsv` (17,021) | `data/3UTR/B_TNR_msk_3UTR_{2,5,20}xAG.out.tsv` | 92 / 102 / 145 GB |
+| 5UTR   | `data/5UTR/B_Cat_5UTR_msk_TNR.tsv` (10,053) | `data/5UTR/B_5UTR_TNR_{2,5,20}xAG.sout.tsv` | ~46 GB |
+| CDS    | `data/CDS/B_Cat_CDS_msk_TNR.tsv` (34,891) | `data/CDS/B_TNR_msk_CDS_{2,5,20}xAG.out.tsv` | 188 / 207 / 293 GB |
+| 3UTR   | `data/3UTR/B_Cat_3UTR_msk_TNR.tsv` (17,020) | `data/3UTR/B_TNR_msk_3UTR_{2,5,20}xAG.out.tsv` | 92 / 102 / 145 GB |
 
 All three catalogs share one 36-column masked schema (no `MotifID`, no
 pathogenic/disease columns). Adding a region later = append a `regions.json` entry
@@ -94,6 +94,19 @@ By design the ag_db holds no disease/pathogenic labels — the catalogs are mask
 and no pathogenic file is read. Any pathogenic-vs-background analysis joins an
 external locus list at analysis time, outside the DB.
 
+**Label-leak re-mask (2026-11-11).** The "masked" catalogs still leaked: `Source =
+KnownDiseaseAssociatedLoci` marked every given pathogenic locus *and* every withheld
+evaluation key, and `FoundInPerfectRepeatsInReference` (`YesButWider` / `YesButNarrower`
+/ missing) marked the same hand-curated loci almost as well. Both columns were dropped
+from the four catalog TSVs and from `data/ag_db/dims/variants/{5UTR,CDS,3UTR}.parquet`
+(in-place Parquet rewrite — no ETL re-run; `variant_id`s and the fact table are
+unchanged; variants dim is now 39 columns). `etl.py::LEAKY_CATALOG_COLS` keeps them out
+of any future rebuild. Originals: gitignored `data/_unmasked_2026-11-11/`. Residual,
+*not* fixed: in CDS the `CNG` canonical motif (11 loci, all disease-catalog; also in the
+`LocusId`) and `ReferenceRepeatPurity` ≈ 0.67 on those same loci; and curated locus
+boundaries in general. Runs before this date saw the leaky columns and are not
+comparable with later runs.
+
 ### 4.5 Provenance log
 Every ETL process appends timestamped lines to `data/ag_db/ag_db.log`: run start +
 manifest, each input file with size/mtime, dim row counts (incl. per-region
@@ -102,7 +115,9 @@ counts. One chronological record of what went into the DB.
 
 ## 5. Build procedure
 
-From the George project root (all three regions' TSVs are present):
+From the George project root. **All three regions' AG TSVs must be present** —
+they were at the 2026-07-23 build but are no longer under `data/` (only the
+catalogs remain), so restore them first; `etl.py preflight` lists what is missing:
 
 ```bash
 sbatch db/etl/build_ag_db.sbatch      # 32 CPU / 250 GB / qos=zhou

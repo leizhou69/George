@@ -1,35 +1,38 @@
 # George
 
-Clean project repo for the **5'UTR GCN tandem-repeat pathogenicity analysis**,
-migrated out of the `Biomni_Rpts_Ds` fork. Biomni is an editable-installed
-dependency (`../biomni-fork`); the AlphaGenome data is served from a
-DuckDB/Parquet backend so the pipeline can scale to other gene regions.
+Project repo for the **tandem-repeat pathogenicity analysis** (5'UTR GCN repeats,
+extended to CDS trinucleotide repeats), migrated out of the `Biomni_Rpts_Ds` fork.
+Biomni is an editable-installed dependency (`../biomni-fork`); the AlphaGenome
+data is served from a multi-region DuckDB/Parquet backend (`data/ag_db/`:
+5UTR + CDS + 3UTR) through the `query_ag` tool.
 
-See `upgrade.md` for the migration plan and `db/AG_DB_DESIGN.md` for the DB design.
+See `CLAUDE.md` for how the harness runs and known gotchas, `db/db_construction.md`
+and `db/ag_db_July2026_summary.md` for the backend, and `biomni_log.md` for the
+run history. `upgrade.md` / `upgrade_log.md` are the (completed) migration record.
 
 ## Layout
 ```
 harness/    run_george.py + slurm/ sbatch scripts   (the batch-experiment harness)
-db/         AG_DB_DESIGN.md, etl/ (DuckDB ETL), query_ag.py (agent query tool)
-queries/    query_05_b.txt (the active scientific task)
-analysis/   active notebooks (pathogenic_repeat_analysis.ipynb, ...)
+db/         design docs, etl/ (DuckDB ETL), query_ag.py (agent query tool)
+queries/    query_05_b.txt (5'UTR task), query_05_cds.txt (CDS task)
+analysis/   notebooks, cross-model comparisons (comparisons_5utr/, comparisons_cds/)
 manuscript/ 5UTR_TNR_0605.pdf
-results/    Top_Candidate_Pathogenic_repeats.csv
-data/       region source files + ag_db/  (moved from old repo; gitignored)
-output/     fresh run outputs             (gitignored)
-archive/    superseded queries/notebooks
+results/    Top_Candidates_5UTR_24July26.csv, Top_Candidates_CDS_24July26.csv
+data/       region catalogs + pathogenic lists + ag_db/   (gitignored)
+output/     run outputs                                    (gitignored)
+archive/    superseded queries
 ```
 
 ## Quickstart
 ```bash
-conda activate biomni_e1
+ml conda && conda activate biomni_e1
 pip install -e ../biomni-fork
 pip install duckdb pyarrow
-python harness/run_george.py s5 o4.8
+python harness/run_george.py s5 o4.8                 # 5'UTR task (default region)
+python harness/run_george.py o5 --region CDS         # CDS task
 ```
 See `environment.md` for details.
 
 ## Migration status
-Scaffolded per **Phase 2** of `upgrade.md`. The Biomni fork extraction (Phase 1),
-keeper migration + data move (Phase 3), and the DuckDB backend (Phase 4+) are
-still pending.
+Complete (Phases 1–8 of `upgrade.md`, finished 2026-07-21; log in `upgrade_log.md`).
+George is self-contained; `Biomni_Rpts_Ds` is a frozen archive.

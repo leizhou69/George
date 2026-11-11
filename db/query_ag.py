@@ -1,19 +1,21 @@
 #!/usr/bin/env python
 """query_ag — DuckDB-backed query tool over the AlphaGenome star schema.
 
-This is the agent's single entry point to the ~309 M-row AlphaGenome dataset
-(db/AG_DB_DESIGN.md §6). It opens an in-process, read-only DuckDB over the
+This is the agent's single entry point to the multi-region AlphaGenome dataset
+(~2.9 B fact rows across 5UTR / CDS / 3UTR; db/AG_DB_DESIGN.md §6,
+db/ag_db_July2026_summary.md). It opens an in-process, read-only DuckDB over the
 partitioned Parquet backend at ``data/ag_db/`` and exposes these views:
 
     ag_scores     fact: one row per AG record (variant × output_type × scorer
                   × track), dimensions replaced by integer FKs. Partition
                   columns region / expansion / output_type are queryable.
-    variants      6.6k repeat loci + all catalog attributes + is_pathogenic/disease
+    variants      ~62k repeat loci (all regions) + all masked-catalog attributes;
+                  NO pathogenic/disease labels (by design)
     tracks        ~5k assay/biosample tracks
     scorers       19 variant scorers (family / requested_output / width / aggregation)
     genes         scored genes referenced per-row by ag_scores.gene_id (nullable)
     output_types  the 11 AG output types
-    regions       region lookup (5UTR, …)
+    regions       region lookup (5UTR, CDS, 3UTR)
 
 Two modes (§8.2):
   * inspect (default): returns a pandas DataFrame capped at ``limit`` (1000)
@@ -90,6 +92,9 @@ def query_ag(sql, to_file=None, limit=ROW_CAP, db=AG_DB):
         pandas.DataFrame — the capped result (inspect) or a head sample of the
         written file (materialize). Notes are printed to stdout.
     """
+    # Tolerate a trailing ';' (the schema examples end with one): the SQL is
+    # wrapped in a subquery / COPY below, where a ';' is a parser error.
+    sql = sql.strip().rstrip(";").rstrip()
     con = get_connection(db)
     try:
         if to_file:

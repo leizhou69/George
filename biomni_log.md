@@ -201,3 +201,86 @@ region's positive list should be built.
 2026-10-31 18:34:10  [start] q05cds_o5.5_Tmp0.5_200m_20261031-183410  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05cds  out=output/Oct_31_2026/q05cds_o5.5_Tmp0.5_200m_20261031-183410
 2026-10-31 18:35:07  [done ] q05b_o5.5_Tmp0.5_200m_20261031-183410  status=FAILED  error=PermissionDeniedError: Error code: 403 - {'type': 'error', 'error': {'type': 'permission_error', 'message': 'model: "claude-opus-5-5" is suspended for this organization until 2026-10-31T23:35:06Z', 'details': {'error_code': 'model_access_suspended'}}, 'request_id': 'req_011Cgb7V736VcQNLEsLJzs6a'}
 2026-10-31 18:35:08  [done ] q05cds_o5.5_Tmp0.5_200m_20261031-183410  status=FAILED  error=PermissionDeniedError: Error code: 403 - {'type': 'error', 'error': {'type': 'permission_error', 'message': 'model: "claude-opus-5-5" is suspended for this organization until 2026-10-31T23:35:06Z', 'details': {'error_code': 'model_access_suspended'}}, 'request_id': 'req_011Cgb7VCchF8Q3bpgCoDqgC'}
+2026-11-01 22:16:48  [start] q05b_o5.5_Tmp0.5_200m_20261101-221648  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_01_2026/q05b_o5.5_Tmp0.5_200m_20261101-221648
+2026-11-01 22:16:48  [start] q05cds_o5.5_Tmp0.5_200m_20261101-221648  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05cds  out=output/Nov_01_2026/q05cds_o5.5_Tmp0.5_200m_20261101-221648
+2026-11-01 22:18:19  [done ] q05b_o5.5_Tmp0.5_200m_20261101-221648  status=FAILED  error=PermissionDeniedError: Error code: 403 - {'type': 'error', 'error': {'type': 'permission_error', 'message': 'model: "claude-opus-5-5" is suspended for this organization until 2026-11-02T04:18:19Z', 'details': {'error_code': 'model_access_suspended'}}, 'request_id': 'req_011CgdNtb2ym82fVAe5dxJ4W'}
+2026-11-01 22:18:20  [done ] q05cds_o5.5_Tmp0.5_200m_20261101-221648  status=FAILED  error=PermissionDeniedError: Error code: 403 - {'type': 'error', 'error': {'type': 'permission_error', 'message': 'model: "claude-opus-5-5" is suspended for this organization until 2026-11-02T04:18:19Z', 'details': {'error_code': 'model_access_suspended'}}, 'request_id': 'req_011CgdNtcuMBnxbYG2tFFoNG'}
+2026-11-11 03:50:43  [start] q05b_o5.5_Tmp0.5_200m_20261111-035043  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_11_2026/q05b_o5.5_Tmp0.5_200m_20261111-035043
+2026-11-11 04:09:08  [start] q05cds_o5.5_Tmp0.5_200m_20261111-040908  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05cds  out=output/Nov_11_2026/q05cds_o5.5_Tmp0.5_200m_20261111-040908
+2026-11-11 04:09:08  [start] q05b_o5.5_Tmp0.5_200m_20261111-040908  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_11_2026/q05b_o5.5_Tmp0.5_200m_20261111-040908
+2026-11-11 04:16:01  [done ] q05cds_o5.5_Tmp0.5_200m_20261111-040908  status=success  log_entries=38  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 04:16:16  [done ] q05b_o5.5_Tmp0.5_200m_20261111-040908  status=success  log_entries=32  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 04:16:28  [start] q05b_gem4c_Tmp0.5_200m_20261111-041628  model=gemini-4-carbon  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_11_2026/q05b_gem4c_Tmp0.5_200m_20261111-041628
+2026-11-11 04:16:30  [done ] q05b_gem4c_Tmp0.5_200m_20261111-041628  status=FAILED  error=ValueError: Generated schema is not a dictionary
+2026-11-11 04:23:58  [start] q05b_f5.2_Tmp0.5_200m_20261111-042358  model=claude-fable-5-2  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_11_2026/q05b_f5.2_Tmp0.5_200m_20261111-042358
+2026-11-11 04:23:59  [start] q05cds_f5.2_Tmp0.5_200m_20261111-042358  model=claude-fable-5-2  temp=0.5  timeout=12000s  query=q05cds  out=output/Nov_11_2026/q05cds_f5.2_Tmp0.5_200m_20261111-042358
+2026-11-11 04:35:08  [start] q05b_gem4c_Tmp0.5_200m_20261111-043508  model=gemini-4-carbon  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_11_2026/q05b_gem4c_Tmp0.5_200m_20261111-043508
+2026-11-11 04:42:41  [done ] q05b_f5.2_Tmp0.5_200m_20261111-042358  status=success  log_entries=38  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 04:49:43  [start] q05cds_gem4c_Tmp0.5_200m_20261111-044943  model=gemini-4-carbon  temp=0.5  timeout=12000s  query=q05cds  out=output/Nov_11_2026/q05cds_gem4c_Tmp0.5_200m_20261111-044943
+2026-11-11 05:26:40  [done ] q05b_gem4c_Tmp0.5_200m_20261111-043508  status=success  log_entries=82  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 05:32:44  [done ] q05cds_gem4c_Tmp0.5_200m_20261111-044943  status=success  log_entries=72  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 05:54:30  [done ] q05cds_f5.2_Tmp0.5_200m_20261111-042358  status=success  log_entries=44  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+
+## 2026-11-11 — Six-model comparison (s5 / o4.8 / o5 / o5.5 / f5.2 / gem4c), 5'UTR + CDS
+
+All Nov-11 runs finished with 3/3 deliverables (o5.5, f5.2, gem4c × 5'UTR, CDS; 50-row
+candidate CSVs each). Re-ran `python analysis/_compare_models.py 5UTR CDS`; outputs in
+`analysis/comparisons_{5utr,cds}/`.
+
+- **5'UTR withheld-key recovery (aggregate):** s5 2/2, o4.8 1/2, o5 1/2, o5.5 2/2,
+  f5.2 0/2, gem4c 2/2; consensus 2/2. Detail: gitignored `.keys/5utr_eval_report.md`.
+- **CDS withheld-key recovery (aggregate):** s5 0/3, o4.8 1/3, o5 2/3, o5.5 2/3,
+  f5.2 0/3, gem4c 2/3; consensus 2/3. Detail: gitignored `.keys/cds_eval_report.md`.
+- **Caveats:** (1) the catalog `Source` column marks known disease loci, including the
+  withheld keys, so recovery is not a clean metric until the catalogs are re-masked;
+  f5.2's 0/N reflects its deliberate exclusion of those loci, not a ranking miss.
+  (2) The 5'UTR s5 comparator predates the GCN SCOPE block. (3) The hypothesis-comparison
+  docs still cover only the July runs.
+
+## 2026-11-11 — Catalog re-mask: dropped `Source` and `FoundInPerfectRepeatsInReference`
+
+Both columns marked the hand-curated disease-catalog loci (the given positives and the
+withheld keys), so withheld-key recovery in every run so far is not a clean metric
+(f5.2 spotted the leak and excluded those loci, hence its 0/N). Dropped from the four
+catalog TSVs and the three `data/ag_db/dims/variants/*.parquet` files (verified
+row-for-row identical otherwise; `variant_id`s unchanged; `query_ag` smoke-tested), the
+`Source` line removed from both query files, and `db/etl/etl.py` now excludes them on
+rebuild. Originals in gitignored `data/_unmasked_2026-11-11/`. Residual CDS leak (`CNG`
+motif, purity ≈ 0.67) left as is. **All models need re-running on the re-masked data
+before any further cross-model comparison.**
+2026-11-11 09:58:26  [start] q05cds_s5_Tmp0.5_200m_20261111-095826  model=claude-sonnet-5  temp=0.5  timeout=12000s  query=q05cds  out=output/Nov_11_2026_remasked/q05cds_s5_Tmp0.5_200m_20261111-095826
+2026-11-11 09:59:06  [start] q05b_gem4c_Tmp0.5_200m_20261111-095906  model=gemini-4-carbon  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_11_2026_remasked/q05b_gem4c_Tmp0.5_200m_20261111-095906
+2026-11-11 09:59:06  [start] q05cds_f5.2_Tmp0.5_200m_20261111-095906  model=claude-fable-5-2  temp=0.5  timeout=12000s  query=q05cds  out=output/Nov_11_2026_remasked/q05cds_f5.2_Tmp0.5_200m_20261111-095906
+2026-11-11 09:59:06  [start] q05b_o5.5_Tmp0.5_200m_20261111-095906  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_11_2026_remasked/q05b_o5.5_Tmp0.5_200m_20261111-095906
+2026-11-11 09:59:06  [start] q05b_s5_Tmp0.5_200m_20261111-095906  model=claude-sonnet-5  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_11_2026_remasked/q05b_s5_Tmp0.5_200m_20261111-095906
+2026-11-11 09:59:06  [start] q05cds_o4.8_Tmp0.5_200m_20261111-095906  model=claude-opus-4-8  temp=0.5  timeout=12000s  query=q05cds  out=output/Nov_11_2026_remasked/q05cds_o4.8_Tmp0.5_200m_20261111-095906
+2026-11-11 09:59:06  [start] q05cds_o5.5_Tmp0.5_200m_20261111-095906  model=claude-opus-5-5  temp=0.5  timeout=12000s  query=q05cds  out=output/Nov_11_2026_remasked/q05cds_o5.5_Tmp0.5_200m_20261111-095906
+2026-11-11 09:59:07  [start] q05b_f5.2_Tmp0.5_200m_20261111-095907  model=claude-fable-5-2  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_11_2026_remasked/q05b_f5.2_Tmp0.5_200m_20261111-095907
+2026-11-11 09:59:07  [start] q05cds_gem4c_Tmp0.5_200m_20261111-095907  model=gemini-4-carbon  temp=0.5  timeout=12000s  query=q05cds  out=output/Nov_11_2026_remasked/q05cds_gem4c_Tmp0.5_200m_20261111-095907
+2026-11-11 09:59:09  [start] q05b_o4.8_Tmp0.5_200m_20261111-095909  model=claude-opus-4-8  temp=0.5  timeout=12000s  query=q05b  out=output/Nov_11_2026_remasked/q05b_o4.8_Tmp0.5_200m_20261111-095909
+2026-11-11 10:04:59  [done ] q05cds_o4.8_Tmp0.5_200m_20261111-095906  status=success  log_entries=52  images=1  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 10:06:05  [done ] q05b_o4.8_Tmp0.5_200m_20261111-095909  status=success  log_entries=68  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 10:07:59  [done ] q05cds_o5.5_Tmp0.5_200m_20261111-095906  status=success  log_entries=44  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 10:10:18  [done ] q05cds_s5_Tmp0.5_200m_20261111-095826  status=success  log_entries=161  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 10:13:21  [done ] q05b_s5_Tmp0.5_200m_20261111-095906  status=success  log_entries=197  images=3  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 10:14:26  [done ] q05b_o5.5_Tmp0.5_200m_20261111-095906  status=success  log_entries=32  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 10:32:43  [done ] q05b_f5.2_Tmp0.5_200m_20261111-095907  status=success  log_entries=48  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 10:40:37  [done ] q05cds_f5.2_Tmp0.5_200m_20261111-095906  status=success  log_entries=36  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+2026-11-11 10:52:11  [done ] q05cds_gem4c_Tmp0.5_200m_20261111-095907  status=success  log_entries=62  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]
+
+## 2026-11-11 — Re-masked re-runs + five-model comparison (s5 / o4.8 / o5.5 / f5.2 / gem4c)
+
+Ten re-runs on the re-masked catalogs / variants dim (`output/Nov_11_2026_remasked/`),
+all 3/3 deliverables with 50-row candidate CSVs. `analysis/_compare_models.py` now reads
+that folder; o5 has no re-masked run and is excluded. The pre-re-mask comparison is kept
+in `analysis/comparisons_{5utr,cds}/pre_remask/`.
+
+- **5'UTR withheld-key recovery (aggregate):** s5 2/2, o4.8 2/2, o5.5 2/2, f5.2 2/2,
+  gem4c 2/2; consensus 2/2. Detail: gitignored `.keys/5utr_eval_report.md`.
+- **CDS withheld-key recovery (aggregate):** s5 2/3, o4.8 0/3, o5.5 2/3, f5.2 1/3,
+  gem4c 2/3; consensus 2/3. Detail: gitignored `.keys/cds_eval_report.md`.
+- **Notes:** the o4.8 CDS list is an outlier (0-2 of 50 shared with every other model;
+  median 4 reference repeats vs 11-14 elsewhere). The gem4c 5'UTR list was rewritten at 11:08 and the
+  5'UTR comparison regenerated afterwards (recovery counts unchanged). Residual CDS leak (`CNG` motif /
+  purity ~0.67) still applies, so CDS recovery is not a fully clean metric.
+2026-11-11 11:09:45  [done ] q05b_gem4c_Tmp0.5_200m_20261111-095906  status=success  log_entries=90  images=0  deliverables=3/3 [pathogenic_repeat_analysis.ipynb, Candidate_Identification.ipynb, Top_Candidate_Pathogenic_repeats.csv]

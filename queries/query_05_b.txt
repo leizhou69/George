@@ -23,7 +23,6 @@ DATA:
 		ReferenceRepeatPurity: Fraction of bases with the locus interval that exactly match perfect repeats of the given motif.
 		NsInFlanks: Number of "N" bases in the reference genome within +/-1000bp of the TR locus. 
 		TRsInRegion: Number of TRs in the vicinity of this locus that are separated from each other by no more than 6bp of spacer sequence.
-		Source:	The source catalog (Table 2) that contributed this locus definition.
 		LeftFlankMappability: UCSC 36-mer mappability track per-base mappability scores averaged across a 150bp window of flanking sequence immediately to the left of the TR locus. Range: 0 to 1
 		RightFlankMappability: UCSC 36-mer mappability track per-base mappability scores averaged across a 150bp window of flanking sequence immediately to the right of the TR locus. Range: 0 to 1
 		FlanksAndLocusMappability: UCSC 36-mer mappability track per-base mappability scores averaged across the TR locus +/- 150bp of flanking sequence. Range: 0 to 1

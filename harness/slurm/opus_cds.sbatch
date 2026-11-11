@@ -21,6 +21,9 @@ cd /blue/zhou/leizhou/Agents/George
 ml conda
 
 conda activate biomni_e1
+# Fail the job (not "COMPLETED") if the harness fails; set after conda activate,
+# and without -u, because conda's activate scripts reference unset vars.
+set -eo pipefail
 
 mkdir -p output/July_24_2026
 
